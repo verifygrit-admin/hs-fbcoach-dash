@@ -97,6 +97,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .back-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--text); flex-shrink: 0; }
 .detail-name { font-size: 1rem; font-weight: 800; }
 .detail-pos { font-size: 0.75rem; color: var(--muted); }
+.detail-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: var(--muted); flex-shrink: 0; overflow: hidden; }
+.detail-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.detail-school-logo { height: 40px; width: 40px; object-fit: contain; flex-shrink: 0; opacity: 0.85; }
 .detail-offer-pill { background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; font-weight: 700; color: var(--offer); white-space: nowrap; }
 
 /* Offer highlight bar */
@@ -224,10 +227,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="detail-header">
       <div class="detail-header-row">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <div>
+        <div id="detailAvatar" class="detail-avatar"></div>
+        <div style="flex:1;min-width:0">
           <div class="detail-name" id="detailName"></div>
           <div class="detail-pos" id="detailPos"></div>
+          <div id="detailXPill" style="margin-top:4px"></div>
         </div>
+        <img src="Boston_College_High__MA__Eagles_Logo-221855465.png" alt="BC High" class="detail-school-logo">
       </div>
       <div class="detail-pill-row" id="detailOfferPill"></div>
       <div class="detail-profile-strip" id="detailProfile"></div>
@@ -907,6 +913,15 @@ function showDetail(idx) {
   document.getElementById('detail').style.display = 'block';
   document.getElementById('detailName').textContent = p.name;
   document.getElementById('detailPos').textContent = `${p.position} · ${p.id} · Class ${p.classYear}`;
+
+  const avatarEl = document.getElementById('detailAvatar');
+  avatarEl.innerHTML = p.headshot
+    ? `<img src="${p.headshot}" alt="${p.name}" onerror="this.parentElement.textContent='${p.initials}'">`
+    : p.initials;
+
+  document.getElementById('detailXPill').innerHTML = p.xUrl
+    ? `<a href="${p.xUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;font-weight:700;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 7px;text-decoration:none">𝕏 ${p.xHandle}</a>`
+    : '';
 
   const pill = document.getElementById('detailOfferPill');
   const offerCount = p.tracking.filter(t => t.offer).length;
