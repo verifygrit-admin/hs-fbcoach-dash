@@ -180,6 +180,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .punch-on  { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
 .punch-off { background: var(--surface2); color: var(--faint); border: 1px solid var(--border); }
 .punch-offer { background: var(--offer-l); color: var(--offer); border: 1px solid #c4b5fd; }
+.sc-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 7px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 10px; }
+.sc-legend span { font-size: 0.62rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; white-space: nowrap; }
 
 #tt { position: fixed; background: #1e293b; color: #f8fafc; font-size: 0.72rem; line-height: 1.45; padding: 7px 10px; border-radius: 7px; max-width: 220px; pointer-events: none; z-index: 9999; display: none; box-shadow: 0 3px 10px rgba(0,0,0,0.28); }
 #tt::after { content: ''; position: absolute; top: 100%; left: 14px; border: 5px solid transparent; border-top-color: #1e293b; }
@@ -1058,7 +1060,16 @@ function renderScoreboard(p) {
       </div>
     </div>`;
   });
-  return `<div class="card-list">${cards.join('')}</div>`;
+  const legend = `<div class="sc-legend">
+    <span data-tip="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</span>
+    <span data-tip="Head Coach has made direct contact with the recruit">HC</span>
+    <span data-tip="Assistant Coach contact established">AC</span>
+    <span data-tip="Junior Day invitation received or attended">Jr Day</span>
+    <span data-tip="Football camp invitation received or attended">Camp</span>
+    <span data-tip="Campus or official visit completed">Visit</span>
+    <span data-tip="Admissions pre-read or early evaluation requested">Adm</span>
+  </div>`;
+  return legend + `<div class="card-list">${cards.join('')}</div>`;
 }
 
 function fmt$(n) { return n ? '$'+n.toLocaleString() : '—'; }
@@ -1088,7 +1099,15 @@ function renderShortList(p) {
       </div>
     </div>`;
   }
-  return `
+  const legend = `<div class="sc-legend">
+    <span data-tip="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</span>
+    <span data-tip="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</span>
+    <span data-tip="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</span>
+    <span data-tip="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</span>
+    <span data-tip="NCAA Division">Div</span>
+    <span data-tip="Athletic conference">Conf</span>
+  </div>`;
+  return legend + `
     <div class="section-head">Pre-Offer Phase (${preOffer.length})</div>
     <div class="card-list">${preOffer.map(card).join('')}</div>
     <div class="section-head" style="margin-top:12px">Remaining Short List (${rest.length})</div>
@@ -1141,7 +1160,18 @@ function renderTracking(p) {
       </div>
     </div>`;
   });
-  return `<div class="card-list">${cards.join('')}</div>`;
+  const legend = `<div class="sc-legend">
+    <span data-tip="GritOS Recruiting Score — used to rank coaches by prospect priority">Score</span>
+    <span data-tip="Player followed this coach on X (Twitter)">Fol'd X</span>
+    <span data-tip="Coach follows the player on X (Twitter)">Fols You</span>
+    <span data-tip="Player sent a direct message to this coach on X">DM</span>
+    <span data-tip="Coach replied to outreach or successful handoff to head coach completed">Reply</span>
+    <span data-tip="Junior Day or campus visit invited to or attended">Jr Day</span>
+    <span data-tip="Football camp invited to or attended at this school">Camp</span>
+    <span data-tip="Head Coach has made direct contact with the recruit">HC</span>
+    <span data-tip="Verbal or Committable Offer of admissions support received from this school">Offer</span>
+  </div>`;
+  return legend + `<div class="card-list">${cards.join('')}</div>`;
 }
 
 function renderEvents(p) {
