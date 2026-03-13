@@ -855,10 +855,15 @@ function renderShortList(p) {
   </table></div>`;
 }
 
+function xLink(handle) {
+  if (!handle) return '';
+  const h = handle.replace(/^@/,'');
+  return `<a href="https://x.com/${h}" target="_blank" rel="noopener" style="font-size:0.6rem;font-weight:700;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:3px;padding:1px 4px;text-decoration:none;margin-left:4px;white-space:nowrap">𝕏</a>`;
+}
 function renderTracking(p) {
   const rows = p.tracking.map(t => `<tr>
     <td style="font-weight:500;white-space:nowrap">${t.school}</td>
-    <td style="color:var(--muted)">${t.coach}</td>
+    <td style="color:var(--muted)">${t.coach}${xLink(t.twitter)}</td>
     <td style="color:var(--faint);font-size:0.65rem">${t.role}</td>
     <td class="chk">${yn(t.followedOnX)}</td>
     <td class="chk">${yn(t.followsYou)}</td>
