@@ -151,6 +151,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* Tracking columns — show checkmarks */
 .chk, .data-table th.chk { text-align: center; width: 44px; }
+/* Tooltip headers */
+.data-table th[title] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
 .chk-y { color: var(--accent); font-size: 0.9rem; }
 .chk-n { color: var(--border); font-size: 0.9rem; }
 
@@ -385,6 +387,7 @@ const PLAYERS = [
     note: "Verbal offer — music conservatory + football alignment"
   },
   onCampusOffers: null, // computed from tracking
+  efc: 14170,
   athleteProfile: {
     height: 71, weight: 240, speed40: 5.0, gpa: 3.2, sat: 1000,
     awards: { expectedStarter: false, captain: false, allConference: false, allState: false }
@@ -410,39 +413,39 @@ const PLAYERS = [
     {rank:18,school:"Bowdoin College",div:"3-Div III",score:12.5,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:false,faRead:false},
   ],
   shortList: [
-    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:46.07,preOffer:true},
-    {school:"Muhlenberg College",conf:"Centennial",div:"3-Div III",coa:"$85,053",ltdv:"$1,913,963",roi:40.34,preOffer:true},
-    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:47.74,preOffer:true},
-    {school:"Hobart William Smith",conf:"Liberty",div:"3-Div III",coa:"$89,771",ltdv:"$1,697,779",roi:36.39,preOffer:true},
-    {school:"St Lawrence University",conf:"Liberty",div:"3-Div III",coa:"$88,778",ltdv:"$1,835,136",roi:41.87,preOffer:true},
-    {school:"University of Rochester",conf:"Liberty",div:"3-Div III",coa:"$94,040",ltdv:"$2,176,205",roi:41.20,preOffer:true},
-    {school:"Hamilton College",conf:"NESCAC",div:"3-Div III",coa:"$92,684",ltdv:"$2,423,600",roi:36.24,preOffer:true},
-    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:31.91,preOffer:true},
-    {school:"Bowdoin College",conf:"NESCAC",div:"3-Div III",coa:"$93,261",ltdv:"$2,306,828",roi:34.49,preOffer:true},
-    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:39.69,preOffer:true},
-    {school:"Lawrence University",conf:"Midwest",div:"3-Div III",coa:"$75,282",ltdv:"$1,566,610",roi:33.20,preOffer:true},
-    {school:"Oberlin College",conf:"NCAC",div:"3-Div III",coa:"$95,227",ltdv:"$1,987,000",roi:54.55,preOffer:true},
-    {school:"Kenyon College",conf:"NCAC",div:"3-Div III",coa:"$95,561",ltdv:"$2,255,500",roi:46.95,preOffer:true},
-    {school:"Denison University",conf:"NCAC",div:"3-Div III",coa:"$91,245",ltdv:"$1,921,440",roi:44.53,preOffer:true},
-    {school:"Worcester Polytechnic",conf:"NEWMAC",div:"3-Div III",coa:"$85,629",ltdv:"$3,013,694",roi:81.18,preOffer:true},
-    {school:"St Olaf College",conf:"MIAC",div:"3-Div III",coa:"$79,055",ltdv:"$1,753,500",roi:39.21,preOffer:true},
-    {school:"William Paterson",conf:"NJAC",div:"3-Div III",coa:"$38,546",ltdv:"$917,463",roi:14.82,preOffer:true},
-    {school:"Carleton College",conf:"MIAC",div:"3-Div III",coa:"$93,664",ltdv:"$2,171,234",roi:40.97,preOffer:true},
-    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:44.17,preOffer:false},
-    {school:"Johns Hopkins",conf:"Centennial",div:"3-Div III",coa:"$92,900",ltdv:"$2,993,147",roi:58.74,preOffer:false},
-    {school:"Carnegie Mellon",conf:"PAC",div:"3-Div III",coa:"$90,512",ltdv:"$3,566,646",roi:63.52,preOffer:false},
-    {school:"Gettysburg College",conf:"Centennial",div:"3-Div III",coa:"$90,773",ltdv:"$2,042,604",roi:54.48,preOffer:false},
-    {school:"Ithaca College",conf:"Liberty",div:"3-Div III",coa:"$74,574",ltdv:"$1,630,420",roi:35.96,preOffer:false},
-    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:47.29,preOffer:false},
-    {school:"Colby College",conf:"NESCAC",div:"3-Div III",coa:"$93,650",ltdv:"$2,631,717",roi:39.35,preOffer:false},
-    {school:"Williams College",conf:"NESCAC",div:"3-Div III",coa:"$93,996",ltdv:"$2,502,576",roi:37.42,preOffer:false},
-    {school:"Amherst College",conf:"NESCAC",div:"3-Div III",coa:"$95,204",ltdv:"$2,638,181",roi:39.45,preOffer:false},
-    {school:"Trinity College",conf:"NESCAC",div:"3-Div III",coa:"$96,768",ltdv:"$2,171,622",roi:44.33,preOffer:false},
-    {school:"Tufts University",conf:"NESCAC",div:"3-Div III",coa:"$96,692",ltdv:"$2,349,116",roi:43.07,preOffer:false},
-    {school:"Middlebury College",conf:"NESCAC",div:"3-Div III",coa:"$93,293",ltdv:"$2,207,346",roi:33.00,preOffer:false},
-    {school:"Chapman University",conf:"SCIAC",div:"3-Div III",coa:"$92,117",ltdv:"$1,848,280",roi:37.55,preOffer:false},
-    {school:"Univ of Redlands",conf:"SCIAC",div:"3-Div III",coa:"$89,048",ltdv:"$1,663,807",roi:36.31,preOffer:false},
-    {school:"Utica University",conf:"Empire 8",div:"3-Div III",coa:"$47,664",ltdv:"$998,460",roi:16.81,preOffer:false},
+    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:46.07,preOffer:true,net4yr:50207},
+    {school:"Muhlenberg College",conf:"Centennial",div:"3-Div III",coa:"$85,053",ltdv:"$1,913,963",roi:40.34,preOffer:true,net4yr:47442},
+    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:47.74,preOffer:true,net4yr:45683},
+    {school:"Hobart William Smith",conf:"Liberty",div:"3-Div III",coa:"$89,771",ltdv:"$1,697,779",roi:36.39,preOffer:true,net4yr:46660},
+    {school:"St Lawrence University",conf:"Liberty",div:"3-Div III",coa:"$88,778",ltdv:"$1,835,136",roi:41.87,preOffer:true,net4yr:43834},
+    {school:"University of Rochester",conf:"Liberty",div:"3-Div III",coa:"$94,040",ltdv:"$2,176,205",roi:41.20,preOffer:true,net4yr:52823},
+    {school:"Hamilton College",conf:"NESCAC",div:"3-Div III",coa:"$92,684",ltdv:"$2,423,600",roi:36.24,preOffer:true,net4yr:66882},
+    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:31.91,preOffer:true,net4yr:66882},
+    {school:"Bowdoin College",conf:"NESCAC",div:"3-Div III",coa:"$93,261",ltdv:"$2,306,828",roi:34.49,preOffer:true,net4yr:66882},
+    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:39.69,preOffer:true,net4yr:57072},
+    {school:"Lawrence University",conf:"Midwest",div:"3-Div III",coa:"$75,282",ltdv:"$1,566,610",roi:33.20,preOffer:true,net4yr:47181},
+    {school:"Oberlin College",conf:"NCAC",div:"3-Div III",coa:"$95,227",ltdv:"$1,987,000",roi:54.55,preOffer:true,net4yr:36425},
+    {school:"Kenyon College",conf:"NCAC",div:"3-Div III",coa:"$95,561",ltdv:"$2,255,500",roi:46.95,preOffer:true,net4yr:48042},
+    {school:"Denison University",conf:"NCAC",div:"3-Div III",coa:"$91,245",ltdv:"$1,921,440",roi:44.53,preOffer:true,net4yr:43150},
+    {school:"Worcester Polytechnic",conf:"NEWMAC",div:"3-Div III",coa:"$85,629",ltdv:"$3,013,694",roi:81.18,preOffer:true,net4yr:37124},
+    {school:"St Olaf College",conf:"MIAC",div:"3-Div III",coa:"$79,055",ltdv:"$1,753,500",roi:39.21,preOffer:true,net4yr:44722},
+    {school:"William Paterson",conf:"NJAC",div:"3-Div III",coa:"$38,546",ltdv:"$917,463",roi:14.82,preOffer:true,net4yr:61919},
+    {school:"Carleton College",conf:"MIAC",div:"3-Div III",coa:"$93,664",ltdv:"$2,171,234",roi:40.97,preOffer:true,net4yr:52993},
+    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:44.17,preOffer:false,net4yr:46270},
+    {school:"Johns Hopkins",conf:"Centennial",div:"3-Div III",coa:"$92,900",ltdv:"$2,993,147",roi:58.74,preOffer:false,net4yr:50958},
+    {school:"Carnegie Mellon",conf:"PAC",div:"3-Div III",coa:"$90,512",ltdv:"$3,566,646",roi:63.52,preOffer:false,net4yr:56154},
+    {school:"Gettysburg College",conf:"Centennial",div:"3-Div III",coa:"$90,773",ltdv:"$2,042,604",roi:54.48,preOffer:false,net4yr:37492},
+    {school:"Ithaca College",conf:"Liberty",div:"3-Div III",coa:"$74,574",ltdv:"$1,630,420",roi:35.96,preOffer:false,net4yr:45336},
+    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:47.29,preOffer:false,net4yr:44300},
+    {school:"Colby College",conf:"NESCAC",div:"3-Div III",coa:"$93,650",ltdv:"$2,631,717",roi:39.35,preOffer:false,net4yr:66882},
+    {school:"Williams College",conf:"NESCAC",div:"3-Div III",coa:"$93,996",ltdv:"$2,502,576",roi:37.42,preOffer:false,net4yr:66882},
+    {school:"Amherst College",conf:"NESCAC",div:"3-Div III",coa:"$95,204",ltdv:"$2,638,181",roi:39.45,preOffer:false,net4yr:66882},
+    {school:"Trinity College",conf:"NESCAC",div:"3-Div III",coa:"$96,768",ltdv:"$2,171,622",roi:44.33,preOffer:false,net4yr:48990},
+    {school:"Tufts University",conf:"NESCAC",div:"3-Div III",coa:"$96,692",ltdv:"$2,349,116",roi:43.07,preOffer:false,net4yr:54536},
+    {school:"Middlebury College",conf:"NESCAC",div:"3-Div III",coa:"$93,293",ltdv:"$2,207,346",roi:33.00,preOffer:false,net4yr:66882},
+    {school:"Chapman University",conf:"SCIAC",div:"3-Div III",coa:"$92,117",ltdv:"$1,848,280",roi:37.55,preOffer:false,net4yr:49217},
+    {school:"Univ of Redlands",conf:"SCIAC",div:"3-Div III",coa:"$89,048",ltdv:"$1,663,807",roi:36.31,preOffer:false,net4yr:45821},
+    {school:"Utica University",conf:"Empire 8",div:"3-Div III",coa:"$47,664",ltdv:"$998,460",roi:16.81,preOffer:false,net4yr:59395},
   ],
   tracking: [
     {school:"Franklin & Marshall",conf:"Centennial",coach:"Chilamo Taylor",role:"WRs & AC",twitter:"@ChilamoT",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:true,offer:false},
@@ -512,6 +515,7 @@ const PLAYERS = [
   lastUpdated: "3/12/2026",
   offerHighlight: null,
   onCampusOffers: null, // computed from tracking
+  efc: 48683,
   athleteProfile: {
     height: 70, weight: 170, speed40: 4.6, gpa: 3.4, sat: 1150,
     awards: { expectedStarter: false, captain: false, allConference: false, allState: false }
@@ -536,43 +540,43 @@ const PLAYERS = [
     {rank:17,school:"Dickinson College",div:"3-Div III",score:12.5,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:false,faRead:false},
   ],
   shortList: [
-    {school:"Villanova University",conf:"Patriot",div:"1-FCS",coa:"$92,904",ltdv:"$3,019,959",roi:24.74,preOffer:true},
-    {school:"University of Maine",conf:"CAA",div:"1-FCS",coa:"$31,506",ltdv:"$993,168",roi:24.47,preOffer:true},
-    {school:"URI",conf:"CAA",div:"1-FCS",coa:"$38,301",ltdv:"$1,662,812",roi:31.87,preOffer:true},
-    {school:"UNH",conf:"CAA",div:"1-FCS",coa:"$40,362",ltdv:"$1,620,740",roi:39.78,preOffer:true},
-    {school:"William & Mary",conf:"Patriot",div:"1-FCS",coa:"$47,697",ltdv:"$2,215,183",roi:31.88,preOffer:true},
-    {school:"Hampton University",conf:"CAA",div:"1-FCS",coa:"$51,240",ltdv:"$935,256",roi:11.12,preOffer:true},
-    {school:"Howard University",conf:"MEAC",div:"1-FCS",coa:"$60,934",ltdv:"$1,378,000",roi:12.61,preOffer:true},
-    {school:"College of the Holy Cross",conf:"Patriot",div:"1-FCS",coa:"$89,481",ltdv:"$2,540,444",roi:25.11,preOffer:true},
-    {school:"Georgetown University",conf:"Patriot",div:"1-FCS",coa:"$97,267",ltdv:"$3,276,925",roi:17.84,preOffer:true},
-    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:9.29,preOffer:true},
-    {school:"Bentley University",conf:"NE10",div:"2-Div II",coa:"$88,032",ltdv:"$3,378,443",roi:16.34,preOffer:true},
-    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:10.11,preOffer:true},
-    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:10.85,preOffer:true},
-    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:10.30,preOffer:true},
-    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:10.46,preOffer:true},
-    {school:"RPI",conf:"Liberty",div:"3-Div III",coa:"$89,552",ltdv:"$2,865,694",roi:14.21,preOffer:true},
-    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:9.77,preOffer:true},
-    {school:"Elon University",conf:"CAA",div:"1-FCS",coa:"$68,715",ltdv:"$1,758,752",roi:15.36,preOffer:false},
-    {school:"Towson University",conf:"CAA",div:"1-FCS",coa:"$34,367",ltdv:"$1,298,304",roi:27.50,preOffer:false},
-    {school:"Stony Brook",conf:"CAA",div:"1-FCS",coa:"$34,939",ltdv:"$1,924,452",roi:47.20,preOffer:false},
-    {school:"NC A&T",conf:"CAA",div:"1-FCS",coa:"$21,782",ltdv:"$906,428",roi:28.40,preOffer:false},
-    {school:"Albany",conf:"CAA",div:"1-FCS",coa:"$31,786",ltdv:"$1,201,132",roi:32.37,preOffer:false},
-    {school:"Fordham University",conf:"Patriot",div:"1-FCS",coa:"$98,354",ltdv:"$2,125,550",roi:14.33,preOffer:false},
-    {school:"Lehigh University",conf:"Patriot",div:"1-FCS",coa:"$88,935",ltdv:"$3,109,861",roi:35.88,preOffer:false},
-    {school:"Morgan State",conf:"MEAC",div:"1-FCS",coa:"$28,470",ltdv:"$699,048",roi:16.51,preOffer:false},
-    {school:"Delaware State",conf:"MEAC",div:"1-FCS",coa:"$35,494",ltdv:"$603,096",roi:11.86,preOffer:false},
-    {school:"UMass Amherst",conf:"Indy",div:"1-FBS",coa:"$38,978",ltdv:"$1,796,256",roi:9.76,preOffer:false},
-    {school:"Morehouse College",conf:"SIAC",div:"2-Div II",coa:"$55,172",ltdv:"$990,196",roi:4.35,preOffer:false},
-    {school:"Clark Atlanta",conf:"SIAC",div:"2-Div II",coa:"$48,584",ltdv:"$860,400",roi:3.74,preOffer:false},
-    {school:"Johnson C Smith",conf:"CIAA",div:"2-Div II",coa:"$38,168",ltdv:"$559,896",roi:2.44,preOffer:false},
-    {school:"University of San Diego",conf:"Pioneer",div:"1-FCS",coa:"$89,158",ltdv:"$2,193,686",roi:10.43,preOffer:false},
-    {school:"Davidson College",conf:"Pioneer",div:"1-FCS",coa:"$88,494",ltdv:"$2,470,922",roi:11.40,preOffer:false},
-    {school:"Univ of St Thomas",conf:"Pioneer",div:"1-FCS",coa:"$76,611",ltdv:"$1,865,719",roi:8.78,preOffer:false},
-    {school:"Marist College",conf:"Pioneer",div:"1-FCS",coa:"$74,261",ltdv:"$2,002,387",roi:9.26,preOffer:false},
-    {school:"Tuskegee University",conf:"SIAC",div:"2-Div II",coa:"$48,355",ltdv:"$981,948",roi:4.27,preOffer:false},
-    {school:"Bryant University",conf:"CAA",div:"1-FCS",coa:"$76,813",ltdv:"$2,407,920",roi:11.57,preOffer:false},
-    {school:"FL A&M",conf:"SWAC",div:"1-FCS",coa:"$26,297",ltdv:"$851,816",roi:22.68,preOffer:false},
+    {school:"Villanova University",conf:"Patriot",div:"1-FCS",coa:"$92,904",ltdv:"$3,019,959",roi:24.74,preOffer:true,net4yr:122087},
+    {school:"University of Maine",conf:"CAA",div:"1-FCS",coa:"$31,506",ltdv:"$993,168",roi:24.47,preOffer:true,net4yr:40588},
+    {school:"URI",conf:"CAA",div:"1-FCS",coa:"$38,301",ltdv:"$1,662,812",roi:31.87,preOffer:true,net4yr:52168},
+    {school:"UNH",conf:"CAA",div:"1-FCS",coa:"$40,362",ltdv:"$1,620,740",roi:39.78,preOffer:true,net4yr:40746},
+    {school:"William & Mary",conf:"Patriot",div:"1-FCS",coa:"$47,697",ltdv:"$2,215,183",roi:31.88,preOffer:true,net4yr:69482},
+    {school:"Hampton University",conf:"CAA",div:"1-FCS",coa:"$51,240",ltdv:"$935,256",roi:11.12,preOffer:true,net4yr:84105},
+    {school:"Howard University",conf:"MEAC",div:"1-FCS",coa:"$60,934",ltdv:"$1,378,000",roi:12.61,preOffer:true,net4yr:109240},
+    {school:"College of the Holy Cross",conf:"Patriot",div:"1-FCS",coa:"$89,481",ltdv:"$2,540,444",roi:25.11,preOffer:true,net4yr:101190},
+    {school:"Georgetown University",conf:"Patriot",div:"1-FCS",coa:"$97,267",ltdv:"$3,276,925",roi:17.84,preOffer:true,net4yr:183640},
+    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:9.29,preOffer:true,net4yr:229784},
+    {school:"Bentley University",conf:"NE10",div:"2-Div II",coa:"$88,032",ltdv:"$3,378,443",roi:16.34,preOffer:true,net4yr:206794},
+    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:10.11,preOffer:true,net4yr:207202},
+    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:10.85,preOffer:true,net4yr:213108},
+    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:10.30,preOffer:true,net4yr:219974},
+    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:10.46,preOffer:true,net4yr:208584},
+    {school:"RPI",conf:"Liberty",div:"3-Div III",coa:"$89,552",ltdv:"$2,865,694",roi:14.21,preOffer:true,net4yr:201710},
+    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:9.77,preOffer:true,net4yr:209171},
+    {school:"Elon University",conf:"CAA",div:"1-FCS",coa:"$68,715",ltdv:"$1,758,752",roi:15.36,preOffer:false,net4yr:114518},
+    {school:"Towson University",conf:"CAA",div:"1-FCS",coa:"$34,367",ltdv:"$1,298,304",roi:27.50,preOffer:false,net4yr:47208},
+    {school:"Stony Brook",conf:"CAA",div:"1-FCS",coa:"$34,939",ltdv:"$1,924,452",roi:47.20,preOffer:false,net4yr:40776},
+    {school:"NC A&T",conf:"CAA",div:"1-FCS",coa:"$21,782",ltdv:"$906,428",roi:28.40,preOffer:false,net4yr:31921},
+    {school:"Albany",conf:"CAA",div:"1-FCS",coa:"$31,786",ltdv:"$1,201,132",roi:32.37,preOffer:false,net4yr:37108},
+    {school:"Fordham University",conf:"Patriot",div:"1-FCS",coa:"$98,354",ltdv:"$2,125,550",roi:14.33,preOffer:false,net4yr:148311},
+    {school:"Lehigh University",conf:"Patriot",div:"1-FCS",coa:"$88,935",ltdv:"$3,109,861",roi:35.88,preOffer:false,net4yr:86667},
+    {school:"Morgan State",conf:"MEAC",div:"1-FCS",coa:"$28,470",ltdv:"$699,048",roi:16.51,preOffer:false,net4yr:42348},
+    {school:"Delaware State",conf:"MEAC",div:"1-FCS",coa:"$35,494",ltdv:"$603,096",roi:11.86,preOffer:false,net4yr:50867},
+    {school:"UMass Amherst",conf:"Indy",div:"1-FBS",coa:"$38,978",ltdv:"$1,796,256",roi:9.76,preOffer:false,net4yr:183977},
+    {school:"Morehouse College",conf:"SIAC",div:"2-Div II",coa:"$55,172",ltdv:"$990,196",roi:4.35,preOffer:false,net4yr:227698},
+    {school:"Clark Atlanta",conf:"SIAC",div:"2-Div II",coa:"$48,584",ltdv:"$860,400",roi:3.74,preOffer:false,net4yr:229784},
+    {school:"Johnson C Smith",conf:"CIAA",div:"2-Div II",coa:"$38,168",ltdv:"$559,896",roi:2.44,preOffer:false,net4yr:229784},
+    {school:"University of San Diego",conf:"Pioneer",div:"1-FCS",coa:"$89,158",ltdv:"$2,193,686",roi:10.43,preOffer:false,net4yr:210247},
+    {school:"Davidson College",conf:"Pioneer",div:"1-FCS",coa:"$88,494",ltdv:"$2,470,922",roi:11.40,preOffer:false,net4yr:216712},
+    {school:"Univ of St Thomas",conf:"Pioneer",div:"1-FCS",coa:"$76,611",ltdv:"$1,865,719",roi:8.78,preOffer:false,net4yr:212377},
+    {school:"Marist College",conf:"Pioneer",div:"1-FCS",coa:"$74,261",ltdv:"$2,002,387",roi:9.26,preOffer:false,net4yr:216274},
+    {school:"Tuskegee University",conf:"SIAC",div:"2-Div II",coa:"$48,355",ltdv:"$981,948",roi:4.27,preOffer:false,net4yr:229784},
+    {school:"Bryant University",conf:"CAA",div:"1-FCS",coa:"$76,813",ltdv:"$2,407,920",roi:11.57,preOffer:false,net4yr:208077},
+    {school:"FL A&M",conf:"SWAC",div:"1-FCS",coa:"$26,297",ltdv:"$851,816",roi:22.68,preOffer:false,net4yr:37557},
   ],
   tracking: [
     {school:"Villanova",conf:"Patriot",coach:"Forrest Rhyne",role:"LBs",twitter:"@CoachRhyne",introType:"Previous Meeting",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:true,preRead:false,hcContact:false,offer:false},
@@ -718,6 +722,10 @@ function renderLanding() {
             <span style="font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px">Athlete Profile ✎</span>
             ${hasData ? `<span style="font-size:0.65rem;color:var(--faint)">${inchesToFtIn(pr.height)} · ${pr.weight} lbs · ${pr.speed40}s</span>` : `<span style="font-size:0.65rem;color:var(--faint);font-style:italic">Tap to enter stats</span>`}
           </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:0.62rem;color:var(--muted)">💰 Est. Family Contribution (EFC)</span>
+            <span style="font-size:0.62rem;font-weight:700;color:var(--bch-gold-t)">$${p.efc ? p.efc.toLocaleString() : '—'}/yr</span>
+          </div>
           ${sc ? `
           <div style="display:flex;flex-direction:column;gap:5px">
             <div>
@@ -824,13 +832,22 @@ function renderScoreboard(p) {
   }).join('');
   return `<div class="table-wrap"><table class="data-table">
     <thead><tr>
-      <th>#</th><th>School</th><th>Div</th><th>Score</th>
-      <th class="chk">HC</th><th class="chk">AC</th><th class="chk">Jr Day</th><th class="chk">Camp</th><th class="chk">Visit</th><th class="chk">Adm</th>
+      <th title="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
+      <th title="College or university name">School</th>
+      <th title="NCAA Division">Div</th>
+      <th title="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
+      <th class="chk" title="Head Coach has made direct contact with the recruit">HC</th>
+      <th class="chk" title="Assistant Coach contact established">AC</th>
+      <th class="chk" title="Junior Day invitation received or attended">Jr Day</th>
+      <th class="chk" title="Football camp invitation received or attended">Camp</th>
+      <th class="chk" title="Campus or official visit completed">Visit</th>
+      <th class="chk" title="Admissions pre-read or early evaluation requested">Adm</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
 }
 
+function fmt$(n) { return n ? '$'+n.toLocaleString() : '—'; }
 function renderShortList(p) {
   const preOffer = p.shortList.filter(s => s.preOffer);
   const rest = p.shortList.filter(s => !s.preOffer);
@@ -841,15 +858,24 @@ function renderShortList(p) {
       <td>${divBadge(s.div)}</td>
       <td style="text-align:right">${s.coa}</td>
       <td style="text-align:right">${s.ltdv}</td>
+      <td style="text-align:right;font-weight:600;color:var(--bch-crimson)">${fmt$(s.net4yr)}</td>
       <td style="text-align:right;font-weight:600;color:var(--accent-t)">${s.roi}x</td>
     </tr>`).join('');
   }
   return `<div class="table-wrap"><table class="data-table">
-    <thead><tr><th>School</th><th>Conf</th><th>Div</th><th style="text-align:right">Ann. COA</th><th style="text-align:right">LTDV</th><th style="text-align:right">ROI</th></tr></thead>
+    <thead><tr>
+      <th title="Target school name">School</th>
+      <th title="Athletic conference">Conf</th>
+      <th title="NCAA Division">Div</th>
+      <th style="text-align:right" title="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
+      <th style="text-align:right" title="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
+      <th style="text-align:right" title="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
+      <th style="text-align:right" title="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
+    </tr></thead>
     <tbody>
-      <tr><td colspan="6" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
+      <tr><td colspan="7" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
       ${rows(preOffer)}
-      <tr><td colspan="6" style="background:var(--surface2);font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Remaining Short List (${rest.length})</td></tr>
+      <tr><td colspan="7" style="background:var(--surface2);font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Remaining Short List (${rest.length})</td></tr>
       ${rows(rest)}
     </tbody>
   </table></div>`;
@@ -876,9 +902,17 @@ function renderTracking(p) {
   </tr>`).join('');
   return `<div class="table-wrap"><table class="data-table">
     <thead><tr>
-      <th>School</th><th>Coach</th><th>Role</th>
-      <th class="chk">Fol'd X</th><th class="chk">Fols You</th><th class="chk">DM</th><th class="chk">Reply</th>
-      <th class="chk">Jr Day</th><th class="chk">Camp</th><th class="chk">HC</th><th class="chk">Offer</th>
+      <th title="Target school">School</th>
+      <th title="Recruiting coach assigned to this prospect">Coach</th>
+      <th title="Coach's staff title or position group">Role</th>
+      <th class="chk" title="You followed this coach on X (Twitter)">Fol'd X</th>
+      <th class="chk" title="Coach follows you back on X (Twitter)">Fols You</th>
+      <th class="chk" title="Direct message sent to coach on X">DM</th>
+      <th class="chk" title="Coach replied to outreach or successful handoff to head coach completed">Reply</th>
+      <th class="chk" title="Junior Day or campus visit attended at this school">Jr Day</th>
+      <th class="chk" title="Football camp attended at this school">Camp</th>
+      <th class="chk" title="Head Coach has made direct contact with the recruit">HC</th>
+      <th class="chk" title="Official football offer received from this school">Offer</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
