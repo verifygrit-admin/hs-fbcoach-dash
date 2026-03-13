@@ -165,6 +165,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .chk, .data-table th.chk { text-align: center; width: 44px; }
 /* Tooltip headers */
 .data-table th[data-tip] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
+
+/* ── Scorecard layout ── */
+.card-list { display: flex; flex-direction: column; gap: 8px; }
+.sc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+.sc-top { display: flex; align-items: center; gap: 10px; }
+.sc-school { font-size: 0.82rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-sub { font-size: 0.65rem; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.sc-stats { display: flex; gap: 14px; margin-top: 7px; flex-wrap: wrap; }
+.sc-stat-lbl { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); }
+.sc-stat-val { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-top: 1px; }
+.punch-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.punch { font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.1px; }
+.punch-on  { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.punch-off { background: var(--surface2); color: var(--faint); border: 1px solid var(--border); }
+.punch-offer { background: var(--offer-l); color: var(--offer); border: 1px solid #c4b5fd; }
+
 #tt { position: fixed; background: #1e293b; color: #f8fafc; font-size: 0.72rem; line-height: 1.45; padding: 7px 10px; border-radius: 7px; max-width: 220px; pointer-events: none; z-index: 9999; display: none; box-shadow: 0 3px 10px rgba(0,0,0,0.28); }
 #tt::after { content: ''; position: absolute; top: 100%; left: 14px; border: 5px solid transparent; border-top-color: #1e293b; }
 .chk-y { color: var(--accent); font-size: 0.9rem; }
@@ -1012,73 +1028,72 @@ function showLanding() {
 }
 
 function renderScoreboard(p) {
-  const rows = p.scoreboard.map(s => {
+  const cards = p.scoreboard.map(s => {
     const c = scoreColor(s.score);
-    const pct = (s.score / 100) * 100;
     const isOffer = p.offerHighlight && p.offerHighlight.school.toLowerCase().includes(s.school.toLowerCase().split(' ')[0]);
-    return `<tr${isOffer ? ' style="background:#f5f3ff"' : ''}>
-      <td><span class="rank-num ${s.rank <= 3 ? 'top' : ''}">${s.rank}</span></td>
-      <td style="font-weight:${isOffer?700:500}">${schoolLink(s.school)}${isOffer?' 🎉':''}</td>
-      <td>${divBadge(s.div)}</td>
-      <td><div class="score-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${c}"></div></div><span class="score-val" style="color:${c}">${s.score}%</span></div></td>
-      <td class="chk">${yn(s.hcContact)}</td>
-      <td class="chk">${yn(s.acContact)}</td>
-      <td class="chk">${yn(s.jrDay)}</td>
-      <td class="chk">${yn(s.camp)}</td>
-      <td class="chk">${yn(s.visit)}</td>
-      <td class="chk">${yn(s.admRead)}</td>
-    </tr>`;
-  }).join('');
-  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
-    <thead><tr>
-      <th style="width:28px" data-tip="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
-      <th data-tip="College or university name">School</th>
-      <th style="width:42px" data-tip="NCAA Division">Div</th>
-      <th style="width:115px" data-tip="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
-      <th class="chk" data-tip="Head Coach has made direct contact with the recruit">HC</th>
-      <th class="chk" data-tip="Assistant Coach contact established">AC</th>
-      <th class="chk" data-tip="Junior Day invitation received or attended">Jr Day</th>
-      <th class="chk" data-tip="Football camp invitation received or attended">Camp</th>
-      <th class="chk" data-tip="Campus or official visit completed">Visit</th>
-      <th class="chk" data-tip="Admissions pre-read or early evaluation requested">Adm</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>`;
+    const borderColor = isOffer ? '#c4b5fd' : s.score >= 62.5 ? '#c4b5fd' : s.score >= 50 ? '#fcd34d' : s.score >= 37.5 ? '#93c5fd' : 'var(--border)';
+    const bgColor    = isOffer ? '#f5f3ff'  : s.score >= 62.5 ? '#f5f3ff'  : s.score >= 50 ? '#fffbeb'  : 'var(--surface)';
+    const punches = [
+      {label:'HC',     val:s.hcContact, tip:'Head Coach direct contact'},
+      {label:'AC',     val:s.acContact, tip:'Asst Coach contact'},
+      {label:'Jr Day', val:s.jrDay,     tip:'Jr Day invited/attended'},
+      {label:'Camp',   val:s.camp,      tip:'Camp invited/attended'},
+      {label:'Visit',  val:s.visit,     tip:'Campus visit completed'},
+      {label:'Adm',    val:s.admRead,   tip:'Admissions pre-read'},
+    ];
+    return `<div class="sc-card" style="border-color:${borderColor};background:${bgColor}">
+      <div class="sc-top">
+        <span class="rank-num ${s.rank <= 3 ? 'top' : ''}">${s.rank}</span>
+        <div style="flex:1;min-width:0">
+          <div class="sc-school">${schoolLink(s.school)}${isOffer ? ' 🎉' : ''}</div>
+          <div class="sc-sub">${divBadge(s.div)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div class="score-bar-bg" style="width:54px"><div class="score-bar-fill" style="width:${s.score}%;background:${c}"></div></div>
+          <span style="font-size:0.8rem;font-weight:800;color:${c};min-width:38px;text-align:right">${s.score}%</span>
+        </div>
+      </div>
+      <div class="punch-row">
+        ${punches.map(pu => `<span class="punch ${pu.val ? 'punch-on' : 'punch-off'}">${pu.val ? '✓' : '·'} ${pu.label}</span>`).join('')}
+      </div>
+    </div>`;
+  });
+  return `<div class="card-list">${cards.join('')}</div>`;
 }
 
 function fmt$(n) { return n ? '$'+n.toLocaleString() : '—'; }
 function renderShortList(p) {
   const byDROI = (a, b) => b.roi - a.roi;
   const preOffer = p.shortList.filter(s => s.preOffer).sort(byDROI);
-  const rest = p.shortList.filter(s => !s.preOffer).sort(byDROI);
-  function rows(arr) {
-    return arr.map(s => `<tr>
-      <td style="font-weight:500">${schoolLink(s.school)}</td>
-      <td>${s.conf}</td>
-      <td>${divBadge(s.div)}</td>
-      <td style="text-align:right">${s.coa}</td>
-      <td style="text-align:right">${s.ltdv}</td>
-      <td style="text-align:right;font-weight:600;color:var(--bch-crimson)">${fmt$(s.net4yr)}</td>
-      <td style="text-align:right;font-weight:600;color:var(--accent-t)">${s.roi}x</td>
-    </tr>`).join('');
+  const rest     = p.shortList.filter(s => !s.preOffer).sort(byDROI);
+  let rank = 1;
+  function card(s) {
+    const r = rank++;
+    return `<div class="sc-card" style="${s.preOffer ? 'border-color:#86efac;background:var(--accent-l)' : ''}">
+      <div class="sc-top">
+        <span class="rank-num ${r <= 3 ? 'top' : ''}">${r}</span>
+        <div style="flex:1;min-width:0">
+          <div class="sc-school">${schoolLink(s.school)}</div>
+          <div class="sc-sub">${divBadge(s.div)}<span>${s.conf}</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:0.95rem;font-weight:800;color:var(--accent-t)">${s.roi}x</div>
+          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted)">DROI</div>
+        </div>
+      </div>
+      <div class="sc-stats">
+        <div><div class="sc-stat-lbl">Ann. COA</div><div class="sc-stat-val">${s.coa}</div></div>
+        <div><div class="sc-stat-lbl">ADTLV</div><div class="sc-stat-val">${s.ltdv}</div></div>
+        <div><div class="sc-stat-lbl">Net 4yr</div><div class="sc-stat-val" style="color:var(--bch-crimson)">${fmt$(s.net4yr)}</div></div>
+      </div>
+    </div>`;
   }
-  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
-    <thead><tr>
-      <th data-tip="Target school name">School</th>
-      <th style="width:72px" data-tip="Athletic conference">Conf</th>
-      <th style="width:42px" data-tip="NCAA Division">Div</th>
-      <th style="width:72px;text-align:right" data-tip="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
-      <th style="width:78px;text-align:right" data-tip="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
-      <th style="width:68px;text-align:right" data-tip="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
-      <th style="width:55px;text-align:right" data-tip="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
-    </tr></thead>
-    <tbody>
-      <tr><td colspan="7" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
-      ${rows(preOffer)}
-      <tr><td colspan="7" style="background:var(--surface2);font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Remaining Short List (${rest.length})</td></tr>
-      ${rows(rest)}
-    </tbody>
-  </table></div>`;
+  return `
+    <div class="section-head">Pre-Offer Phase (${preOffer.length})</div>
+    <div class="card-list">${preOffer.map(card).join('')}</div>
+    <div class="section-head" style="margin-top:12px">Remaining Short List (${rest.length})</div>
+    <div class="card-list">${rest.map(card).join('')}</div>
+  `;
 }
 
 function xLink(handle) {
@@ -1087,35 +1102,46 @@ function xLink(handle) {
   return `<a href="https://x.com/${h}" target="_blank" rel="noopener" style="font-size:0.6rem;font-weight:700;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:3px;padding:1px 4px;text-decoration:none;margin-left:4px;white-space:nowrap">𝕏</a>`;
 }
 function renderTracking(p) {
-  const rows = p.tracking.map(t => `<tr>
-    <td style="font-weight:500;white-space:nowrap">${schoolLink(t.school)}</td>
-    <td style="color:var(--muted)">${t.coach}${xLink(t.twitter)}</td>
-    <td style="color:var(--faint);font-size:0.65rem">${t.role}</td>
-    <td class="chk">${yn(t.followedOnX)}</td>
-    <td class="chk">${yn(t.followsYou)}</td>
-    <td class="chk">${yn(t.dmSent)}</td>
-    <td class="chk">${yn(t.replied||t.handoff)}</td>
-    <td class="chk">${yn(t.jrDay||t.visit)}</td>
-    <td class="chk">${yn(t.camp)}</td>
-    <td class="chk">${yn(t.hcContact)}</td>
-    <td class="chk">${yn(t.offer)}</td>
-  </tr>`).join('');
-  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
-    <thead><tr>
-      <th style="width:110px" data-tip="Target school">School</th>
-      <th data-tip="Recruiting coach assigned to this prospect">Coach</th>
-      <th style="width:82px" data-tip="Coach's staff title or position group">Role</th>
-      <th class="chk" data-tip="Player followed this coach on X (Twitter)">Fol'd X</th>
-      <th class="chk" data-tip="Coach follows the player on X (Twitter)">Fols You</th>
-      <th class="chk" data-tip="Player sent a direct message to this coach on X">DM</th>
-      <th class="chk" data-tip="Coach replied to outreach or successful handoff to head coach completed">Reply</th>
-      <th class="chk" data-tip="Junior Day or campus visit invited to or attended">Jr Day</th>
-      <th class="chk" data-tip="Football camp invited to or attended at this school">Camp</th>
-      <th class="chk" data-tip="Head Coach has made direct contact with the recruit">HC</th>
-      <th class="chk" data-tip="Verbal or Committable Offer of admissions support received from this school">Offer</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>`;
+  // Build score lookup with fuzzy match for abbreviated school names
+  const scoreMap = {};
+  p.scoreboard.forEach(s => { scoreMap[s.school.toLowerCase()] = s.score; });
+  function getScore(name) {
+    const k = name.toLowerCase();
+    if (scoreMap[k] !== undefined) return scoreMap[k];
+    for (const [sk, sv] of Object.entries(scoreMap)) {
+      if (sk.includes(k) || k.includes(sk)) return sv;
+    }
+    return undefined;
+  }
+  const sorted = [...p.tracking].sort((a, b) => (getScore(b.school) || 0) - (getScore(a.school) || 0));
+  const cards = sorted.map((t, i) => {
+    const score = getScore(t.school);
+    const c = score !== undefined ? scoreColor(score) : 'var(--muted)';
+    const punches = [
+      {label:"Fol'd X",  val:t.followedOnX,        cls:'punch-on'},
+      {label:'Fols You', val:t.followsYou,          cls:'punch-on'},
+      {label:'DM',       val:t.dmSent,              cls:'punch-on'},
+      {label:'Reply',    val:t.replied||t.handoff,  cls:'punch-on'},
+      {label:'Jr Day',   val:t.jrDay||t.visit,      cls:'punch-on'},
+      {label:'Camp',     val:t.camp,                cls:'punch-on'},
+      {label:'HC',       val:t.hcContact,           cls:'punch-on'},
+      {label:'Offer',    val:t.offer,               cls:'punch-offer'},
+    ];
+    return `<div class="sc-card" style="${t.offer ? 'border-color:#c4b5fd;background:#f5f3ff' : ''}">
+      <div class="sc-top">
+        <span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span>
+        <div style="flex:1;min-width:0">
+          <div class="sc-school">${schoolLink(t.school)}</div>
+          <div class="sc-sub" style="margin-top:3px">${t.coach}${xLink(t.twitter)}<span style="color:var(--faint)">· ${t.role}</span><span style="font-size:0.62rem;color:var(--faint);font-style:italic">${t.introType}</span></div>
+        </div>
+        ${score !== undefined ? `<span style="font-size:0.8rem;font-weight:800;color:${c};flex-shrink:0">${score}%</span>` : ''}
+      </div>
+      <div class="punch-row">
+        ${punches.map(pu => `<span class="punch ${pu.val ? pu.cls : 'punch-off'}">${pu.val ? '✓' : '·'} ${pu.label}</span>`).join('')}
+      </div>
+    </div>`;
+  });
+  return `<div class="card-list">${cards.join('')}</div>`;
 }
 
 function renderEvents(p) {
