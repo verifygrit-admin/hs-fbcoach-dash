@@ -1002,7 +1002,7 @@ function renderScoreboard(p) {
     const isOffer = p.offerHighlight && p.offerHighlight.school.toLowerCase().includes(s.school.toLowerCase().split(' ')[0]);
     return `<tr${isOffer ? ' style="background:#f5f3ff"' : ''}>
       <td><span class="rank-num ${s.rank <= 3 ? 'top' : ''}">${s.rank}</span></td>
-      <td style="font-weight:${isOffer?700:500}">${s.school}${isOffer?' 🎉':''}</td>
+      <td style="font-weight:${isOffer?700:500}">${schoolLink(s.school)}${isOffer?' 🎉':''}</td>
       <td>${divBadge(s.div)}</td>
       <td><div class="score-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${c}"></div></div><span class="score-val" style="color:${c}">${s.score}%</span></div></td>
       <td class="chk">${yn(s.hcContact)}</td>
