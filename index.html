@@ -152,7 +152,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* Tracking columns — show checkmarks */
 .chk, .data-table th.chk { text-align: center; width: 44px; }
 /* Tooltip headers */
-.data-table th[title] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
+.data-table th[data-tip] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
+#tt { position: fixed; background: #1e293b; color: #f8fafc; font-size: 0.72rem; line-height: 1.45; padding: 7px 10px; border-radius: 7px; max-width: 220px; pointer-events: none; z-index: 9999; display: none; box-shadow: 0 3px 10px rgba(0,0,0,0.28); }
+#tt::after { content: ''; position: absolute; top: 100%; left: 14px; border: 5px solid transparent; border-top-color: #1e293b; }
 .chk-y { color: var(--accent); font-size: 0.9rem; }
 .chk-n { color: var(--border); font-size: 0.9rem; }
 
@@ -832,16 +834,16 @@ function renderScoreboard(p) {
   }).join('');
   return `<div class="table-wrap"><table class="data-table">
     <thead><tr>
-      <th title="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
-      <th title="College or university name">School</th>
-      <th title="NCAA Division">Div</th>
-      <th title="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
-      <th class="chk" title="Head Coach has made direct contact with the recruit">HC</th>
-      <th class="chk" title="Assistant Coach contact established">AC</th>
-      <th class="chk" title="Junior Day invitation received or attended">Jr Day</th>
-      <th class="chk" title="Football camp invitation received or attended">Camp</th>
-      <th class="chk" title="Campus or official visit completed">Visit</th>
-      <th class="chk" title="Admissions pre-read or early evaluation requested">Adm</th>
+      <th data-tip="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
+      <th data-tip="College or university name">School</th>
+      <th data-tip="NCAA Division">Div</th>
+      <th data-tip="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
+      <th class="chk" data-tip="Head Coach has made direct contact with the recruit">HC</th>
+      <th class="chk" data-tip="Assistant Coach contact established">AC</th>
+      <th class="chk" data-tip="Junior Day invitation received or attended">Jr Day</th>
+      <th class="chk" data-tip="Football camp invitation received or attended">Camp</th>
+      <th class="chk" data-tip="Campus or official visit completed">Visit</th>
+      <th class="chk" data-tip="Admissions pre-read or early evaluation requested">Adm</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
@@ -864,13 +866,13 @@ function renderShortList(p) {
   }
   return `<div class="table-wrap"><table class="data-table">
     <thead><tr>
-      <th title="Target school name">School</th>
-      <th title="Athletic conference">Conf</th>
-      <th title="NCAA Division">Div</th>
-      <th style="text-align:right" title="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
-      <th style="text-align:right" title="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
-      <th style="text-align:right" title="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
-      <th style="text-align:right" title="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
+      <th data-tip="Target school name">School</th>
+      <th data-tip="Athletic conference">Conf</th>
+      <th data-tip="NCAA Division">Div</th>
+      <th style="text-align:right" data-tip="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
+      <th style="text-align:right" data-tip="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
+      <th style="text-align:right" data-tip="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
+      <th style="text-align:right" data-tip="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
     </tr></thead>
     <tbody>
       <tr><td colspan="7" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
@@ -902,17 +904,17 @@ function renderTracking(p) {
   </tr>`).join('');
   return `<div class="table-wrap"><table class="data-table">
     <thead><tr>
-      <th title="Target school">School</th>
-      <th title="Recruiting coach assigned to this prospect">Coach</th>
-      <th title="Coach's staff title or position group">Role</th>
-      <th class="chk" title="You followed this coach on X (Twitter)">Fol'd X</th>
-      <th class="chk" title="Coach follows you back on X (Twitter)">Fols You</th>
-      <th class="chk" title="Direct message sent to coach on X">DM</th>
-      <th class="chk" title="Coach replied to outreach or successful handoff to head coach completed">Reply</th>
-      <th class="chk" title="Junior Day or campus visit attended at this school">Jr Day</th>
-      <th class="chk" title="Football camp attended at this school">Camp</th>
-      <th class="chk" title="Head Coach has made direct contact with the recruit">HC</th>
-      <th class="chk" title="Official football offer received from this school">Offer</th>
+      <th data-tip="Target school">School</th>
+      <th data-tip="Recruiting coach assigned to this prospect">Coach</th>
+      <th data-tip="Coach's staff title or position group">Role</th>
+      <th class="chk" data-tip="You followed this coach on X (Twitter)">Fol'd X</th>
+      <th class="chk" data-tip="Coach follows you back on X (Twitter)">Fols You</th>
+      <th class="chk" data-tip="Direct message sent to coach on X">DM</th>
+      <th class="chk" data-tip="Coach replied to outreach or successful handoff to head coach completed">Reply</th>
+      <th class="chk" data-tip="Junior Day or campus visit attended at this school">Jr Day</th>
+      <th class="chk" data-tip="Football camp attended at this school">Camp</th>
+      <th class="chk" data-tip="Head Coach has made direct contact with the recruit">HC</th>
+      <th class="chk" data-tip="Official football offer received from this school">Offer</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
@@ -941,6 +943,51 @@ function renderEvents(p) {
     </div>`;
   }).join('');
 }
+
+// ── Tooltip ──
+(function() {
+  const tt = document.createElement('div');
+  tt.id = 'tt';
+  document.body.appendChild(tt);
+  let hideTimer;
+  function show(el, clientX, clientY) {
+    const text = el.getAttribute('data-tip');
+    if (!text) return;
+    clearTimeout(hideTimer);
+    tt.textContent = text;
+    tt.style.display = 'block';
+    position(clientX, clientY);
+  }
+  function position(x, y) {
+    const tw = tt.offsetWidth, th = tt.offsetHeight, vw = window.innerWidth;
+    let left = x - tw / 2;
+    if (left < 6) left = 6;
+    if (left + tw > vw - 6) left = vw - tw - 6;
+    tt.style.left = left + 'px';
+    tt.style.top = (y - th - 14) + 'px';
+  }
+  function hide() { tt.style.display = 'none'; }
+  document.addEventListener('mouseover', e => {
+    const th = e.target.closest('th[data-tip]');
+    if (th) show(th, e.clientX, e.clientY);
+    else hide();
+  });
+  document.addEventListener('mousemove', e => {
+    if (tt.style.display === 'block') position(e.clientX, e.clientY);
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('th[data-tip]')) hide();
+  });
+  document.addEventListener('touchstart', e => {
+    const th = e.target.closest('th[data-tip]');
+    if (th) {
+      const t = e.touches[0];
+      show(th, t.clientX, t.clientY);
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(hide, 2500);
+    }
+  }, { passive: true });
+})();
 
 // ── Init ──
 if (sessionStorage.getItem('gritos_auth') === ACCESS) {
