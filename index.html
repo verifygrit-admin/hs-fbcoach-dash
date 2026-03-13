@@ -12,6 +12,9 @@
   --gold: #d97706; --gold-l: #fffbeb;
   --radius: 10px; --shadow: 0 1px 4px rgba(0,0,0,0.08);
   --offer: #7c3aed; --offer-l: #f5f3ff;
+  /* BC High Eagles */
+  --bch-crimson: #7C1E2E; --bch-crimson-t: #5e1623; --bch-crimson-l: #fdf2f4;
+  --bch-gold: #C8922A; --bch-gold-t: #a67520; --bch-gold-l: #fdf6e8;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
@@ -42,40 +45,40 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* ── Player card (landing) ── */
 .player-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: box-shadow .15s, border-color .15s; position: relative; overflow: hidden; }
-.player-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); border-color: var(--accent); }
-.player-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
-.pc-offer::before { background: var(--offer); }
+.player-card:hover { box-shadow: 0 4px 16px rgba(124,30,46,0.15); border-color: var(--bch-crimson); }
+.player-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--bch-crimson); }
+.pc-offer::before { background: var(--bch-crimson); }
 .pc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
 .pc-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: var(--muted); flex-shrink: 0; overflow: hidden; }
 .pc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .pc-name { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.2; }
 .pc-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 .pc-said { font-size: 0.65rem; color: var(--faint); margin-top: 1px; letter-spacing: 0.3px; }
-.pc-offer-banner { background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 7px; padding: 8px 10px; margin-bottom: 10px; }
-.pc-offer-label { font-size: 0.65rem; font-weight: 700; color: var(--offer); letter-spacing: 0.5px; text-transform: uppercase; }
-.pc-offer-school { font-size: 0.85rem; font-weight: 700; color: var(--offer); margin-top: 1px; }
-.pc-offer-detail { font-size: 0.7rem; color: #7c3aed99; margin-top: 1px; }
+.pc-offer-banner { background: var(--bch-gold-l); border: 1px solid var(--bch-gold); border-radius: 7px; padding: 8px 10px; margin-bottom: 10px; }
+.pc-offer-label { font-size: 0.65rem; font-weight: 700; color: var(--bch-crimson); letter-spacing: 0.5px; text-transform: uppercase; }
+.pc-offer-school { font-size: 0.85rem; font-weight: 700; color: var(--bch-crimson); margin-top: 1px; }
+.pc-offer-detail { font-size: 0.7rem; color: var(--bch-gold-t); margin-top: 1px; }
 .pc-stats { display: flex; gap: 12px; margin-bottom: 10px; }
 .pc-stat { flex: 1; }
-.pc-stat-val { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
-.pc-offer-count .pc-stat-val { color: var(--offer); }
+.pc-stat-val { font-size: 1.1rem; font-weight: 800; color: var(--bch-crimson); }
+.pc-offer-count .pc-stat-val { color: var(--bch-gold-t); }
 .pc-stat-lbl { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2px; }
 .progress-wrap { margin-bottom: 10px; }
 .progress-label { display: flex; justify-content: space-between; margin-bottom: 4px; }
 .progress-label span { font-size: 0.7rem; color: var(--muted); }
-.progress-label strong { font-size: 0.7rem; color: var(--accent-t); }
+.progress-label strong { font-size: 0.7rem; color: var(--bch-crimson); }
 .progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
+.progress-fill { height: 100%; background: var(--bch-crimson); border-radius: 3px; transition: width 1s ease; }
 .pc-events { }
 .pc-events-label { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
 .pc-event-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .pc-event-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.dot-critical { background: #dc2626; }
-.dot-registered { background: var(--accent); }
+.dot-critical { background: var(--bch-crimson); }
+.dot-registered { background: var(--bch-gold); }
 .dot-upcoming { background: var(--faint); }
 .pc-event-name { font-size: 0.72rem; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pc-event-date { font-size: 0.65rem; color: var(--muted); flex-shrink: 0; }
-.pc-cta { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; padding: 8px; background: var(--accent-l); border-radius: 7px; font-size: 0.75rem; font-weight: 600; color: var(--accent-t); }
+.pc-cta { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; padding: 8px; background: var(--bch-crimson-l); border-radius: 7px; font-size: 0.75rem; font-weight: 600; color: var(--bch-crimson); }
 
 /* ── Detail view ── */
 #detail { display: none; padding-bottom: 24px; }
@@ -519,11 +522,12 @@ function renderLanding() {
     return `<div class="player-card ${offerClass}" onclick="showDetail(${i})">
       <div class="pc-top">
         <div class="pc-avatar">${p.headshot ? `<img src="${p.headshot}" alt="${p.name}" onerror="this.parentElement.textContent='${p.initials}'">` : p.initials}</div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="pc-name">${p.name}</div>
           <div class="pc-meta">${p.position} · Class of ${p.classYear}</div>
           <div class="pc-said">${p.id}</div>
         </div>
+        <img src="Boston_College_High__MA__Eagles_Logo-221855465.png" alt="BC High" style="height:36px;width:36px;object-fit:contain;flex-shrink:0;opacity:0.85;">
       </div>
       ${p.offerHighlight ? `
       <div class="pc-offer-banner">
