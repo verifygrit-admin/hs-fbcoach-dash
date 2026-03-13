@@ -1059,25 +1059,39 @@ function showLanding() {
   document.getElementById('landing').style.display = 'block';
 }
 
+function buildOfferSet(p) {
+  const s = new Set();
+  p.tracking.forEach(t => { if (t.offer) s.add(t.school.toLowerCase()); });
+  if (p.offerHighlight) s.add(p.offerHighlight.school.toLowerCase());
+  return s;
+}
+function isOffered(name, offerSet) {
+  const k = name.toLowerCase();
+  if (offerSet.has(k)) return true;
+  for (const s of offerSet) { if (k.includes(s) || s.includes(k)) return true; }
+  return false;
+}
+
 function renderScoreboard(p) {
+  const offers = buildOfferSet(p);
   const cards = p.scoreboard.map(s => {
     const c = scoreColor(s.score);
-    const isOffer = p.offerHighlight && p.offerHighlight.school.toLowerCase().includes(s.school.toLowerCase().split(' ')[0]);
-    const borderColor = isOffer ? '#c4b5fd' : s.score >= 62.5 ? '#c4b5fd' : s.score >= 50 ? '#fcd34d' : s.score >= 37.5 ? '#93c5fd' : 'var(--border)';
-    const bgColor    = isOffer ? '#f5f3ff'  : s.score >= 62.5 ? '#f5f3ff'  : s.score >= 50 ? '#fffbeb'  : 'var(--surface)';
+    const offered = isOffered(s.school, offers);
+    const borderColor = offered ? '#c4b5fd' : s.score >= 62.5 ? '#c4b5fd' : s.score >= 50 ? '#fcd34d' : s.score >= 37.5 ? '#93c5fd' : 'var(--border)';
+    const bgColor    = offered ? '#f5f3ff'  : s.score >= 62.5 ? '#f5f3ff'  : s.score >= 50 ? '#fffbeb'  : 'var(--surface)';
     const punches = [
-      {label:'HC',     val:s.hcContact, tip:'Head Coach direct contact'},
-      {label:'AC',     val:s.acContact, tip:'Asst Coach contact'},
-      {label:'Jr Day', val:s.jrDay,     tip:'Jr Day invited/attended'},
-      {label:'Camp',   val:s.camp,      tip:'Camp invited/attended'},
-      {label:'Visit',  val:s.visit,     tip:'Campus visit completed'},
-      {label:'Adm',    val:s.admRead,   tip:'Admissions pre-read'},
+      {label:'HC',     val:s.hcContact},
+      {label:'AC',     val:s.acContact},
+      {label:'Jr Day', val:s.jrDay},
+      {label:'Camp',   val:s.camp},
+      {label:'Visit',  val:s.visit},
+      {label:'Adm',    val:s.admRead},
     ];
     return `<div class="sc-card" style="border-color:${borderColor};background:${bgColor}">
       <div class="sc-top">
         <span class="rank-num ${s.rank <= 3 ? 'top' : ''}">${s.rank}</span>
         <div style="flex:1;min-width:0">
-          <div class="sc-school">${schoolLink(s.school)}${isOffer ? ' 🎉' : ''}</div>
+          <div class="sc-school">${schoolLink(s.school)}${offered ? ' 🎉' : ''}</div>
           <div class="sc-sub">${divBadge(s.div)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -1107,14 +1121,17 @@ function renderShortList(p) {
   const byDROI = (a, b) => b.roi - a.roi;
   const preOffer = p.shortList.filter(s => s.preOffer).sort(byDROI);
   const rest     = p.shortList.filter(s => !s.preOffer).sort(byDROI);
+  const offers   = buildOfferSet(p);
   let rank = 1;
   function card(s) {
     const r = rank++;
-    return `<div class="sc-card" style="${s.preOffer ? 'border-color:#86efac;background:var(--accent-l)' : ''}">
+    const offered = isOffered(s.school, offers);
+    const cardStyle = offered ? 'border-color:#c4b5fd;background:#f5f3ff' : s.preOffer ? 'border-color:#86efac;background:var(--accent-l)' : '';
+    return `<div class="sc-card" style="${cardStyle}">
       <div class="sc-top">
         <span class="rank-num ${r <= 3 ? 'top' : ''}">${r}</span>
         <div style="flex:1;min-width:0">
-          <div class="sc-school">${schoolLink(s.school)}</div>
+          <div class="sc-school">${schoolLink(s.school)}${offered ? ' 🎉' : ''}</div>
           <div class="sc-sub">${divBadge(s.div)}<span>${s.conf}</span></div>
         </div>
         <div style="text-align:right;flex-shrink:0">
@@ -1180,7 +1197,7 @@ function renderTracking(p) {
       <div class="sc-top">
         <span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span>
         <div style="flex:1;min-width:0">
-          <div class="sc-school">${schoolLink(t.school)}</div>
+          <div class="sc-school">${schoolLink(t.school)}${t.offer ? ' 🎉' : ''}</div>
           <div class="sc-sub" style="margin-top:3px">${t.coach}${xLink(t.twitter)}<span style="color:var(--faint)">· ${t.role}</span><span style="font-size:0.62rem;color:var(--faint);font-style:italic">${t.introType}</span></div>
         </div>
         ${score !== undefined ? `<span style="font-size:0.8rem;font-weight:800;color:${c};flex-shrink:0">${score}%</span>` : ''}
