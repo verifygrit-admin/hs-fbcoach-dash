@@ -215,6 +215,93 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
+// ── Athlete Scoring (ported from cfb-recruit-hub scoring.js) ──
+const SAT_PCT = {
+  1600:.999,1590:.998,1580:.997,1570:.996,1560:.995,1550:.994,1540:.993,1530:.992,1520:.991,1510:.990,
+  1500:.990,1490:.990,1480:.990,1470:.990,1460:.990,1450:.990,1440:.980,1430:.980,1420:.980,1410:.970,
+  1400:.970,1390:.970,1380:.960,1370:.960,1360:.950,1350:.940,1340:.940,1330:.930,1320:.930,1310:.920,
+  1300:.910,1290:.900,1280:.890,1270:.880,1260:.870,1250:.860,1240:.850,1230:.840,1220:.830,1210:.820,
+  1200:.810,1190:.800,1180:.780,1170:.770,1160:.760,1150:.740,1140:.730,1130:.710,1120:.700,1110:.690,
+  1100:.670,1090:.650,1080:.630,1070:.610,1060:.600,1050:.580,1040:.560,1030:.540,1020:.520,1010:.500,
+  1000:.480,990:.470,980:.450,970:.430,960:.410,950:.390,940:.370,930:.360,920:.340,910:.320,900:.310,
+  890:.290,880:.280,870:.270,860:.250,850:.240,840:.230,830:.220,820:.210,810:.200,800:.190,
+};
+const ATH_STD = {
+  "Power 4": { DT:{h50:75,w50:300,s50:4.85}, CB:{h50:72,w50:190,s50:4.45}, ATH:{h50:73,w50:205,s50:4.50} },
+  "G6":      { DT:{h50:74,w50:285,s50:5.00}, CB:{h50:71,w50:180,s50:4.55}, ATH:{h50:71,w50:195,s50:4.60} },
+  "1-FCS":   { DT:{h50:72,w50:275,s50:5.10}, CB:{h50:70,w50:175,s50:4.60}, ATH:{h50:71,w50:190,s50:4.65} },
+  "2-Div II":{ DT:{h50:71,w50:260,s50:5.20}, CB:{h50:69,w50:170,s50:4.65}, ATH:{h50:70,w50:185,s50:4.70} },
+  "3-Div III":{DT:{h50:70,w50:250,s50:5.30}, CB:{h50:68,w50:165,s50:4.70}, ATH:{h50:69,w50:175,s50:4.75} },
+};
+const TIER_ORDER = ["Power 4","G6","1-FCS","2-Div II","3-Div III"];
+const TIER_LABELS = {"Power 4":"P4","G6":"G6","1-FCS":"FCS","2-Div II":"D2","3-Div III":"D3"};
+const TIER_COLORS_ATH = {"Power 4":"#f5a623","G6":"#4fc3f7","1-FCS":"#81c784","2-Div II":"#ef9a9a","3-Div III":"#b0bec5"};
+
+function normCDF(z) {
+  const x = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.3275911 * x);
+  const erfc = ((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return z >= 0 ? 1 - erfc/2 : erfc/2;
+}
+function getSATPct(sat) {
+  const r = Math.round(+sat/10)*10;
+  const keys = Object.keys(SAT_PCT).map(Number).sort((a,b)=>b-a);
+  for (const k of keys) { if (r >= k) return SAT_PCT[k]; }
+  return 0.01;
+}
+function getGPAPct(gpa) { return Math.min(1, Math.max(0, (+gpa-1.0)/2.7)); }
+function calcAthFit(pos, h, w, s, tier) {
+  const std = ATH_STD[tier]?.[pos];
+  if (!std) return 0;
+  return (normCDF((h-std.h50)/1.5) + normCDF((w-std.w50)/(std.w50*0.05)) + (1-normCDF((s-std.s50)/0.15))) / 3;
+}
+function inchesToFtIn(inches) {
+  const ft = Math.floor(inches/12), i = inches%12;
+  return `${ft}'${i}"`;
+}
+
+// Get athlete stats (localStorage overrides raw player data)
+function profileKey(id) { return `gritos_profile_${id}`; }
+function getProfile(p) {
+  const stored = localStorage.getItem(profileKey(p.id));
+  return stored ? { ...p.athleteProfile, ...JSON.parse(stored) } : { ...p.athleteProfile };
+}
+function editProfile(id) {
+  const player = PLAYERS.find(p => p.id === id);
+  const cur = getProfile(player);
+  const h  = prompt(`Height — inches (e.g. 73 = 6'1"):`, cur.height||'');       if (h===null) return;
+  const w  = prompt(`Weight — lbs:`, cur.weight||'');                             if (w===null) return;
+  const s  = prompt(`40-yard dash (e.g. 5.10):`, cur.speed40||'');               if (s===null) return;
+  const g  = prompt(`GPA (e.g. 3.50):`, cur.gpa||'');                            if (g===null) return;
+  const st = prompt(`SAT/PSAT score (leave blank if none):`, cur.sat||'');        if (st===null) return;
+  const profile = { height:+h||0, weight:+w||0, speed40:+s||0, gpa:+g||0, sat:st?+st:null };
+  localStorage.setItem(profileKey(id), JSON.stringify(profile));
+  renderLanding(); // re-render to reflect updates
+}
+function computeScores(player) {
+  const pr = getProfile(player);
+  if (!pr.height || !pr.weight || !pr.speed40 || !pr.gpa) return null;
+  const pos = player.position.includes('/') ? player.position.split('/').map(s=>s.trim()) : [player.position];
+  // Use first recognized position for ATH_STD lookup; fallback to ATH for multi-pos
+  const lookupPos = pos.find(p => ATH_STD["3-Div III"]?.[p]) || 'ATH';
+  const satPct = pr.sat ? getSATPct(pr.sat) : 0.48; // default 1000
+  const gpaPct = getGPAPct(pr.gpa);
+  const acadRigor   = (satPct + gpaPct) / 2;
+  const acadTestOpt = gpaPct;
+  const athFit = {};
+  TIER_ORDER.forEach(tier => { athFit[tier] = calcAthFit(lookupPos, pr.height, pr.weight, pr.speed40, tier); });
+  // Apply awards boost
+  const awards = player.athleteProfile.awards || {};
+  let boost = 0;
+  if (awards.expectedStarter) boost += 0.05;
+  if (awards.captain)         boost += 0.05;
+  if (awards.allConference)   boost += 0.10;
+  if (awards.allState)        boost += 0.15;
+  TIER_ORDER.forEach(tier => { athFit[tier] = Math.min(1, athFit[tier] + boost); });
+  const qualifyingTiers = TIER_ORDER.filter(t => athFit[t] > 0.50);
+  return { pr, acadRigor, acadTestOpt, athFit, qualifyingTiers, lookupPos };
+}
+
 // ── Film Growth ──
 function filmGrowth(p) {
   const current = getFilmViews(p);
@@ -294,6 +381,10 @@ const PLAYERS = [
     note: "Verbal offer — music conservatory + football alignment"
   },
   onCampusOffers: null, // computed from tracking
+  athleteProfile: {
+    height: 0, weight: 0, speed40: 0, gpa: 0, sat: null,
+    awards: { expectedStarter: false, captain: false, allConference: false, allState: false }
+  },
   scoreboard: [
     {rank:1,school:"Oberlin College",div:"3-Div III",score:62.5,indyAdm:false,hcContact:true,acContact:true,jrDay:true,camp:false,visit:true,admRead:true,faRead:false},
     {rank:2,school:"Hobart William Smith",div:"3-Div III",score:62.5,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
@@ -417,6 +508,10 @@ const PLAYERS = [
   lastUpdated: "3/12/2026",
   offerHighlight: null,
   onCampusOffers: null, // computed from tracking
+  athleteProfile: {
+    height: 0, weight: 0, speed40: 0, gpa: 0, sat: null,
+    awards: { expectedStarter: false, captain: false, allConference: false, allState: false }
+  },
   scoreboard: [
     {rank:1,school:"University of Maine",div:"1-FCS",score:75.0,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:true,faRead:false},
     {rank:2,school:"Wesleyan University",div:"3-Div III",score:62.5,indyAdm:false,hcContact:true,acContact:false,jrDay:true,camp:true,visit:true,admRead:true,faRead:false},
@@ -610,6 +705,41 @@ function renderLanding() {
           <div class="pc-event-date">${e.date.replace(', 2026','').replace(', 2025','')}</div>
         </div>`).join('')}
       </div>
+      ${(()=>{
+        const sc = computeScores(p);
+        const pr = getProfile(p);
+        const hasData = pr.height && pr.weight && pr.speed40 && pr.gpa;
+        return `<div style="border:1px solid var(--border);border-radius:8px;padding:9px 10px;margin-bottom:10px;background:var(--surface2)" onclick="event.stopPropagation();editProfile('${p.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px">Athlete Profile ✎</span>
+            ${hasData ? `<span style="font-size:0.65rem;color:var(--faint)">${inchesToFtIn(pr.height)} · ${pr.weight} lbs · ${pr.speed40}s</span>` : `<span style="font-size:0.65rem;color:var(--faint);font-style:italic">Tap to enter stats</span>`}
+          </div>
+          ${sc ? `
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+                <span style="font-size:0.62rem;color:var(--muted)">📚 Academic Profile (SAT + GPA)</span>
+                <span style="font-size:0.62rem;font-weight:700;color:var(--bch-crimson)">${(sc.acadRigor*100).toFixed(1)}%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px"><div style="height:100%;width:${(sc.acadRigor*100).toFixed(1)}%;background:var(--bch-crimson);border-radius:2px"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+                <span style="font-size:0.62rem;color:var(--muted)">✏️ Academic Profile (GPA Only)</span>
+                <span style="font-size:0.62rem;font-weight:700;color:var(--bch-gold-t)">${(sc.acadTestOpt*100).toFixed(1)}%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px"><div style="height:100%;width:${(sc.acadTestOpt*100).toFixed(1)}%;background:var(--bch-gold);border-radius:2px"></div></div>
+            </div>
+            ${sc.qualifyingTiers.length ? `
+            <div style="margin-top:3px">
+              <div style="font-size:0.62rem;color:var(--muted);margin-bottom:4px">🏈 Division Athletic Fit (qualifying)</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px">
+                ${sc.qualifyingTiers.map(t=>`<span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${TIER_COLORS_ATH[t]}22;border:1px solid ${TIER_COLORS_ATH[t]};color:${TIER_COLORS_ATH[t]}">${TIER_LABELS[t]} ${(sc.athFit[t]*100).toFixed(0)}%</span>`).join('')}
+              </div>
+            </div>` : `<div style="font-size:0.62rem;color:var(--faint);font-style:italic;margin-top:2px">No qualifying division fit > 50% yet</div>`}
+          </div>` : `<div style="font-size:0.62rem;color:var(--faint);font-style:italic;text-align:center;padding:4px 0">Scores appear once stats are entered</div>`}
+        </div>`;
+      })()}
       <div class="pc-cta">View Full Profile →</div>
     </div>`;
   }).join('');
