@@ -355,7 +355,7 @@ function editFilmViews(id, statEl) {
 }
 
 // ── Auth ──
-const ACCESS = btoa("BCHS2027"); // password: BCHS2027
+const ACCESS = btoa("AMDG2027"); // password: AMDG2027
 function checkGate() {
   const v = document.getElementById('gateInput').value.trim();
   if (btoa(v) === ACCESS || sessionStorage.getItem('gritos_auth') === ACCESS) {
