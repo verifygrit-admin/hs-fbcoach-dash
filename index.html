@@ -82,11 +82,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* ── Detail view ── */
 #detail { display: none; padding-bottom: 24px; }
-.detail-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
-.back-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--text); }
+.detail-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.detail-header-row { display: flex; align-items: center; gap: 10px; }
+.detail-pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.back-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--text); flex-shrink: 0; }
 .detail-name { font-size: 1rem; font-weight: 800; }
 .detail-pos { font-size: 0.75rem; color: var(--muted); }
-.detail-offer-pill { margin-left: auto; background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; font-weight: 700; color: var(--offer); }
+.detail-offer-pill { background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; font-weight: 700; color: var(--offer); white-space: nowrap; }
 
 /* Offer highlight bar */
 .offer-bar { margin: 12px 16px 0; background: var(--offer-l); border: 1.5px solid #c4b5fd; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
@@ -201,12 +203,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- Detail -->
   <div id="detail">
     <div class="detail-header">
-      <button class="back-btn" onclick="showLanding()">← Back</button>
-      <div>
-        <div class="detail-name" id="detailName"></div>
-        <div class="detail-pos" id="detailPos"></div>
+      <div class="detail-header-row">
+        <button class="back-btn" onclick="showLanding()">← Back</button>
+        <div>
+          <div class="detail-name" id="detailName"></div>
+          <div class="detail-pos" id="detailPos"></div>
+        </div>
       </div>
-      <div id="detailOfferPill"></div>
+      <div class="detail-pill-row" id="detailOfferPill"></div>
     </div>
     <div id="detailOfferBar"></div>
     <div class="tabs" id="detailTabs"></div>
