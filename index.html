@@ -1014,12 +1014,12 @@ function renderScoreboard(p) {
       <td class="chk">${yn(s.admRead)}</td>
     </tr>`;
   }).join('');
-  return `<div class="table-wrap"><table class="data-table">
+  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
     <thead><tr>
-      <th data-tip="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
+      <th style="width:28px" data-tip="GritOS Recruiting Rank — ordered by milestone completion score">#</th>
       <th data-tip="College or university name">School</th>
-      <th data-tip="NCAA Division">Div</th>
-      <th data-tip="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
+      <th style="width:42px" data-tip="NCAA Division">Div</th>
+      <th style="width:115px" data-tip="GritOS Recruiting Score — % of key recruitment milestones achieved across coach contact, events, and admissions">Score</th>
       <th class="chk" data-tip="Head Coach has made direct contact with the recruit">HC</th>
       <th class="chk" data-tip="Assistant Coach contact established">AC</th>
       <th class="chk" data-tip="Junior Day invitation received or attended">Jr Day</th>
@@ -1047,15 +1047,15 @@ function renderShortList(p) {
       <td style="text-align:right;font-weight:600;color:var(--accent-t)">${s.roi}x</td>
     </tr>`).join('');
   }
-  return `<div class="table-wrap"><table class="data-table">
+  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
     <thead><tr>
       <th data-tip="Target school name">School</th>
-      <th data-tip="Athletic conference">Conf</th>
-      <th data-tip="NCAA Division">Div</th>
-      <th style="text-align:right" data-tip="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
-      <th style="text-align:right" data-tip="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
-      <th style="text-align:right" data-tip="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
-      <th style="text-align:right" data-tip="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
+      <th style="width:72px" data-tip="Athletic conference">Conf</th>
+      <th style="width:42px" data-tip="NCAA Division">Div</th>
+      <th style="width:72px;text-align:right" data-tip="Annual Cost of Attendance — full sticker price: tuition, room, board, and fees">Ann. COA</th>
+      <th style="width:78px;text-align:right" data-tip="Adjusted Discounted Total Lifetime Value — projected earnings premium over a non-college path, discounted to present value and adjusted for graduation rate">ADTLV</th>
+      <th style="width:68px;text-align:right" data-tip="Projected 4-year net cost with football offer + merit aid applied to this family's EFC. Lower = better affordability.">Net 4yr</th>
+      <th style="width:55px;text-align:right" data-tip="Discounted ROI — ADTLV ÷ 4-yr Net Cost. Measures financial return on education investment. Higher = stronger value.">DROI</th>
     </tr></thead>
     <tbody>
       <tr><td colspan="7" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
@@ -1085,11 +1085,11 @@ function renderTracking(p) {
     <td class="chk">${yn(t.hcContact)}</td>
     <td class="chk">${yn(t.offer)}</td>
   </tr>`).join('');
-  return `<div class="table-wrap"><table class="data-table">
+  return `<div class="table-wrap"><table class="data-table" style="table-layout:fixed">
     <thead><tr>
-      <th data-tip="Target school">School</th>
+      <th style="width:110px" data-tip="Target school">School</th>
       <th data-tip="Recruiting coach assigned to this prospect">Coach</th>
-      <th data-tip="Coach's staff title or position group">Role</th>
+      <th style="width:82px" data-tip="Coach's staff title or position group">Role</th>
       <th class="chk" data-tip="Player followed this coach on X (Twitter)">Fol'd X</th>
       <th class="chk" data-tip="Coach follows the player on X (Twitter)">Fols You</th>
       <th class="chk" data-tip="Player sent a direct message to this coach on X">DM</th>
