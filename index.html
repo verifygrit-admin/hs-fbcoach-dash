@@ -161,6 +161,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .div-d3 { background: #dbeafe; color: #1e40af; }
 .div-d2 { background: #fce7f3; color: #9d174d; }
 .div-fbs { background: #fef3c7; color: #92400e; }
+.div-all { background: #f3e8ff; color: #6b21a8; }
 
 /* Tracking columns — show checkmarks */
 .chk, .data-table th.chk { text-align: center; width: 44px; }
@@ -542,7 +543,7 @@ const PLAYERS = [
     {month:"April",school:"F&M Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"April 26, 2026",time:"10:30 AM",location:"Lancaster, PA",registered:false,onCalendar:false,critical:false,note:""},
     {month:"May",school:"U Rochester In-Person Jr Day",div:"D3",type:"In-Person Jr Day",day:"Friday",date:"May 1, 2026",time:"12:00 PM",location:"Rochester, NY",registered:true,onCalendar:true,critical:false,note:"Get pass from guidance"},
     {month:"May",school:"Bowdoin Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 3, 2026",time:"11:00 AM",location:"Brunswick, ME",registered:false,onCalendar:false,critical:false,note:""},
-    {month:"May",school:"Catholic Conference Showcase",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
+    {month:"May",school:"Catholic Conference Showcase",div:"All",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
     {month:"May",school:"Bates Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 24, 2026",time:"9:00 AM",location:"Lewiston, ME",registered:false,onCalendar:false,critical:false,note:""},
     {month:"May",school:"Denison Camp",div:"D3",type:"FB School Camp",day:"Saturday",date:"May 30, 2026",time:"9:00 AM",location:"Granville, OH",registered:false,onCalendar:false,critical:false,note:""},
     {month:"June",school:"Empire Elite Camp",div:"D1-D3",type:"FB Mega Camp",day:"Sunday",date:"June 7, 2026",time:"8:00 AM",location:"Schenectady, NY",registered:true,onCalendar:true,critical:true,note:"Top 3 Critical Camp"},
@@ -676,7 +677,7 @@ const PLAYERS = [
     {month:"April",school:"Union Junior Day",div:"D3",type:"In-Person Jr Day",day:"Friday",date:"April 24, 2026",time:"2:30 PM",location:"Schenectady, NY",registered:true,onCalendar:true,critical:false,note:"High Academic D2/D3 Tour"},
     {month:"April",school:"F&M Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"April 26, 2026",time:"10:30 AM",location:"Lancaster, PA",registered:true,onCalendar:true,critical:false,note:"High Academic D2/D3 Tour"},
     {month:"May",school:"Bowdoin Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 3, 2026",time:"11:00 AM",location:"Brunswick, ME",registered:false,onCalendar:false,critical:false,note:"NESCAC Tour"},
-    {month:"May",school:"Catholic Conference Showcase",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
+    {month:"May",school:"Catholic Conference Showcase",div:"All",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
     {month:"May",school:"Bates Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 24, 2026",time:"9:00 AM",location:"Lewiston, ME",registered:false,onCalendar:false,critical:false,note:"NESCAC Tour"},
     {month:"May",school:"Marist Mega Camp",div:"FCS",type:"FB Mega Camp",day:"Sunday",date:"May 31, 2026",time:"8:00 AM",location:"Poughkeepsie, NY",registered:false,onCalendar:false,critical:false,note:"High Academic D2/D3 Tour"},
     {month:"June",school:"Fordham Mega Camp",div:"FCS/D3",type:"FB Mega Camp",day:"Thursday",date:"June 4, 2026",time:"11:30 AM",location:"Bronx, NY",registered:false,onCalendar:false,critical:false,note:"Patriot League Tour"},
@@ -816,6 +817,7 @@ function schoolLink(name) {
 
 // ── Helpers ──
 function divBadge(div) {
+  if (div === 'All') return `<span class="div-badge div-all">All</span>`;
   const cls = div.includes('FCS')||div.includes('1-') ? 'div-fcs' : div.includes('D3')||div.includes('3-') ? 'div-d3' : div.includes('D2')||div.includes('2-') ? 'div-d2' : 'div-fbs';
   const label = div.includes('FCS')||div.includes('1-FCS') ? 'FCS' : div.includes('FBS')||div.includes('1-FBS') ? 'FBS' : div.includes('2-') ? 'D2' : 'D3';
   return `<span class="div-badge ${cls}">${label}</span>`;
