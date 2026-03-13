@@ -909,8 +909,9 @@ function renderScoreboard(p) {
 
 function fmt$(n) { return n ? '$'+n.toLocaleString() : '—'; }
 function renderShortList(p) {
-  const preOffer = p.shortList.filter(s => s.preOffer);
-  const rest = p.shortList.filter(s => !s.preOffer);
+  const byDROI = (a, b) => b.roi - a.roi;
+  const preOffer = p.shortList.filter(s => s.preOffer).sort(byDROI);
+  const rest = p.shortList.filter(s => !s.preOffer).sort(byDROI);
   function rows(arr) {
     return arr.map(s => `<tr>
       <td style="font-weight:500">${s.school}</td>
