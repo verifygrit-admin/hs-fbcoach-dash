@@ -241,7 +241,10 @@ const PLAYERS = [
   school: "Boston College High School",
   classYear: 2027,
   progress: 62.1,
-  filmViews: 72,
+  filmViews: 29,
+  filmTitle: "Jesse Bargar 27' Junior Highlights",
+  filmUploaded: "Jan 30, 2026",
+  hudlUrl: "http://www.hudl.com/v/2TV47c",
   lastUpdated: "3/12/2026",
   offerHighlight: {
     school: "Oberlin College",
@@ -360,7 +363,10 @@ const PLAYERS = [
   school: "Boston College High School",
   classYear: 2027,
   progress: 60.7,
-  filmViews: 55,
+  filmViews: 37,
+  filmTitle: "Junior Year Highlights",
+  filmUploaded: "Feb 13, 2026",
+  hudlUrl: "http://www.hudl.com/v/2THSWm",
   lastUpdated: "3/12/2026",
   offerHighlight: null,
   onCampusOffers: 8,
@@ -519,6 +525,13 @@ function renderLanding() {
           <div class="pc-stat-lbl">Film Views</div>
         </div>
       </div>
+      <a href="${p.hudlUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;padding:7px 10px;margin-bottom:10px;text-decoration:none;">
+        <span style="font-size:0.9rem">🎬</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.72rem;font-weight:700;color:#c2410c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.filmTitle}</div>
+          <div style="font-size:0.65rem;color:#ea580c">Uploaded ${p.filmUploaded} · Watch on Hudl ↗</div>
+        </div>
+      </a>
       <div class="progress-wrap">
         <div class="progress-label"><span>Pipeline Progress</span><strong>${p.progress}%</strong></div>
         <div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%"></div></div>
@@ -548,11 +561,11 @@ function showDetail(idx) {
   document.getElementById('detailPos').textContent = `${p.position} · ${p.id} · Class ${p.classYear}`;
 
   const pill = document.getElementById('detailOfferPill');
-  if (p.offerHighlight) {
-    pill.innerHTML = `<span class="detail-offer-pill">🎉 Verbal Offer — ${p.offerHighlight.school}</span>`;
-  } else if (p.onCampusOffers > 0) {
-    pill.innerHTML = `<span class="detail-offer-pill" style="background:#f0fdf4;border-color:#86efac;color:#16a34a">${p.onCampusOffers} On-Campus Offer${p.onCampusOffers>1?'s':''}</span>`;
-  } else { pill.innerHTML = ''; }
+  let pillHtml = '';
+  if (p.offerHighlight) pillHtml += `<span class="detail-offer-pill">🎉 Verbal Offer — ${p.offerHighlight.school}</span> `;
+  else if (p.onCampusOffers > 0) pillHtml += `<span class="detail-offer-pill" style="background:#f0fdf4;border-color:#86efac;color:#16a34a">${p.onCampusOffers} On-Campus Offer${p.onCampusOffers>1?'s':''}</span> `;
+  pillHtml += `<a href="${p.hudlUrl}" target="_blank" rel="noopener" class="detail-offer-pill" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c;text-decoration:none">🎬 Film ↗</a>`;
+  pill.innerHTML = pillHtml;
 
   const offerBar = document.getElementById('detailOfferBar');
   if (p.offerHighlight) {
