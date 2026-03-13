@@ -849,7 +849,7 @@ function renderLanding() {
         ${topEvents.map(e => `
         <div class="pc-event-row">
           <div class="pc-event-dot ${e.critical ? 'dot-critical' : e.registered ? 'dot-registered' : 'dot-upcoming'}"></div>
-          <div class="pc-event-name">${e.school}</div>
+          <div class="pc-event-name">${(u => u ? `<a href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none">${e.school}</a>` : e.school)(EVENT_URLS[e.school])}</div>
           <div class="pc-event-date">${e.date.replace(', 2026','').replace(', 2025','')}</div>
         </div>`).join('')}
       </div>
