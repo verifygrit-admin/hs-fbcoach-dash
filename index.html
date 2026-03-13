@@ -164,7 +164,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* Tracking columns — show checkmarks */
 .chk, .data-table th.chk { text-align: center; width: 44px; }
 /* Tooltip headers */
-.data-table th[data-tip] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
+[data-tip] { cursor: help; text-decoration: underline dotted var(--faint); text-underline-offset: 2px; }
 
 /* ── Scorecard layout ── */
 .card-list { display: flex; flex-direction: column; gap: 8px; }
@@ -1222,21 +1222,21 @@ function renderEvents(p) {
   }
   function hide() { tt.style.display = 'none'; }
   document.addEventListener('mouseover', e => {
-    const th = e.target.closest('th[data-tip]');
-    if (th) show(th, e.clientX, e.clientY);
+    const el = e.target.closest('[data-tip]');
+    if (el) show(el, e.clientX, e.clientY);
     else hide();
   });
   document.addEventListener('mousemove', e => {
     if (tt.style.display === 'block') position(e.clientX, e.clientY);
   });
   document.addEventListener('mouseout', e => {
-    if (e.target.closest('th[data-tip]')) hide();
+    if (e.target.closest('[data-tip]')) hide();
   });
   document.addEventListener('touchstart', e => {
-    const th = e.target.closest('th[data-tip]');
-    if (th) {
+    const el = e.target.closest('[data-tip]');
+    if (el) {
       const t = e.touches[0];
-      show(th, t.clientX, t.clientY);
+      show(el, t.clientX, t.clientY);
       clearTimeout(hideTimer);
       hideTimer = setTimeout(hide, 2500);
     }
