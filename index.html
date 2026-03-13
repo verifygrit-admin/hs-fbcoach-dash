@@ -644,6 +644,129 @@ const PLAYERS = [
 }
 ];
 
+// ── URL Lookups ──
+const SCHOOL_COACH_URLS = {
+  "Franklin & Marshall":"https://godiplomats.com/sports/football/coaches",
+  "Muhlenberg College":"https://muhlenbergsports.com/sports/football/coaches",
+  "Union College":"https://unionathletics.com/sports/football/coaches",
+  "Hobart William Smith":"https://hwsathletics.com/sports/football/coaches",
+  "St Lawrence University":"https://saintsathletics.com/sports/football/coaches",
+  "University of Rochester":"https://uofrathletics.com/sports/football/coaches",
+  "Hamilton College":"https://athletics.hamilton.edu/sports/football/coaches",
+  "Bates College":"https://gobatesbobcats.com/sports/football/coaches",
+  "Bowdoin College":"https://athletics.bowdoin.edu/sports/football/coaches",
+  "Wesleyan University":"https://athletics.wesleyan.edu/sports/football/coaches",
+  "Lawrence University":"https://vikings.lawrence.edu/sports/football/coaches",
+  "Oberlin College":"https://goyeo.com/sports/football/coaches",
+  "Kenyon College":"https://athletics.kenyon.edu/sports/football/coaches",
+  "Denison University":"https://denisonbigred.com/sports/football/coaches",
+  "Worcester Polytechnic":"https://athletics.wpi.edu/sports/football/coaches",
+  "St Olaf College":"https://athletics.stolaf.edu/sports/football/coaches",
+  "William Paterson":"https://www.wpupioneers.com/sports/football/coaches",
+  "Carleton College":"https://athletics.carleton.edu/sports/football/coaches",
+  "Dickinson College":"https://dickinsonathletics.com/sports/football/coaches",
+  "Johns Hopkins":"https://hopkinssports.com/sports/football/coaches",
+  "Carnegie Mellon":"https://athletics.cmu.edu/sports/fball/coaches/index",
+  "Gettysburg College":"https://gettysburgsports.com/sports/football/coaches",
+  "Ithaca College":"https://athletics.ithaca.edu/sports/football/coaches",
+  "Catholic University":"https://catholicathletics.com/sports/football/coaches",
+  "Colby College":"https://colbyathletics.com/sports/football/coaches",
+  "Williams College":"https://ephsports.williams.edu/sports/football/coaches",
+  "Amherst College":"https://athletics.amherst.edu/sports/football/coaches",
+  "Trinity College":"https://bantamsports.com/sports/football/coaches",
+  "Tufts University":"https://gotuftsjumbos.com/sports/football/coaches",
+  "Middlebury College":"https://athletics.middlebury.edu/sports/football/coaches",
+  "Chapman University":"https://athletics.chapman.edu/sports/football/coaches",
+  "Univ of Redlands":"https://goredlands.com/sports/football/coaches",
+  "Utica University":"https://uticapioneers.com/sports/football/coaches",
+  "Villanova University":"https://villanova.com/sports/football/coaches",
+  "University of Maine":"https://goblackbears.com/sports/football/coaches",
+  "URI":"https://gorhody.com/sports/football/coaches",
+  "UNH":"https://unhwildcats.com/sports/football/coaches",
+  "William & Mary":"https://tribeathletics.com/sports/football/coaches",
+  "Hampton University":"https://hamptonpirates.com/sports/football/coaches",
+  "Howard University":"https://hubison.com/sports/football/coaches",
+  "College of the Holy Cross":"https://goholycross.com/sports/football/coaches",
+  "Georgetown University":"https://guhoyas.com/sports/football/coaches",
+  "Bentley University":"https://bentleyfalcons.com/sports/football/coaches",
+  "RPI":"https://rpiathletics.com/sports/football/coaches",
+  "Elon University":"https://elonphoenix.com/sports/football/coaches",
+  "Towson University":"https://towsontigers.com/sports/football/coaches",
+  "Stony Brook":"https://stonybrookathletics.com/sports/football/coaches",
+  "NC A&T":"https://ncataggies.com/sports/football/coaches",
+  "Albany":"https://ualbanysports.com/sports/football/coaches",
+  "Fordham University":"https://fordhamsports.com/sports/football/coaches",
+  "Lehigh University":"https://lehighsports.com/sports/football/coaches",
+  "Morgan State":"https://morganstatebears.com/sports/football/coaches",
+  "Delaware State":"https://dsuhornets.com/sports/football/coaches",
+  "UMass Amherst":"https://umassathletics.com/sports/football/coaches",
+  "Morehouse College":"https://morehouseathletics.com/sports/football/coaches",
+  "Clark Atlanta":"https://clarkatlantasports.com/sports/football/coaches",
+  "Johnson C Smith":"https://goldenbullsports.com/sports/football/coaches",
+  "University of San Diego":"https://usdtoreros.com/sports/football/coaches",
+  "Davidson College":"https://davidsonwildcats.com/sports/football/coaches/1000",
+  "Univ of St Thomas":"https://tommiesports.com/sports/football/coaches",
+  "Marist College":"https://goredfoxes.com/sports/football/coaches",
+  "Tuskegee University":"https://goldentigersports.com/sports/football/coaches",
+  "Bryant University":"https://bryantbulldogs.com/sports/football/coaches",
+  "FL A&M":"https://famuathletics.com/sports/football/coaches/2021",
+  // Ayden tracking uses abbreviated school names
+  "Villanova":"https://villanova.com/sports/football/coaches",
+  "Hampton":"https://hamptonpirates.com/sports/football/coaches",
+  "Howard":"https://hubison.com/sports/football/coaches",
+  "Holy Cross":"https://goholycross.com/sports/football/coaches",
+  "Georgetown":"https://guhoyas.com/sports/football/coaches",
+  "Bentley":"https://bentleyfalcons.com/sports/football/coaches",
+  "Wesleyan":"https://athletics.wesleyan.edu/sports/football/coaches",
+  "Dickinson":"https://dickinsonathletics.com/sports/football/coaches",
+};
+
+const EVENT_URLS = {
+  "Bentley Virtual Jr Day":"https://docs.google.com/forms/d/e/1FAIpQLSf9FxCWdjFzQGd1fJM-h5elgy_SfPH69tUAXr1eTHklrNNxLA/viewform",
+  "U Rochester Virtual Jr Day":"https://em.armssoftware.com/ls/click?upn=u001.XQ2f3-2FNAA61pPzgbTkRHl4RLYVo8nz8HM4VT22rKqct6RehowNCTc1KjRaLgG4x4aS8TfxiNpf-2BtqvUKPQqhIuO3IIwyDYy7TZ0b0FtRtXnatZH3cIvHiVrYur3Q-2BCVo_2zR_05lXV46NJF5U-2B3pLxCAg0zg-2BswTAUOr-2FEfcSbhNToVty5OQFrs4n4diY4nUbbnuLeOARTfHcpqPirMUQoc7JGsN-2FbB1trkMxyShzJJZM0VRMpd-2FBeiL6BoOK0SlhDWuD2uWe9t90WXhlbuAqKOqy-2BmSVpaIVLT0FUPSkgZ-2BKQ2q8owM7F80FEFjVzMWpXw01eU4WzXNnq1-2BF3jwYmC65hgeSvzw6Y5J-2BP4LRq8y9SAV6sQGFMuIlDzFUtM3EXpSP1dcotZGO0NirLQPsMLpxlS9DnYdel-2BaRxOJw8693unVN-2Bc0LiNDxSCepjZVJMwuy",
+  "Trinity Junior Day":"https://questionnaires.armssoftware.com/45d7e20f8821",
+  "Catholic University Jr Day":"https://forms.gle/djZxvhPJFS5FAgxP8",
+  "Red & Black Camp":"https://register.ryzer.com/camp.cfm?sport=1&id=313980",
+  "WPI On-Campus Jr Day":"https://docs.google.com/forms/d/e/1FAIpQLSfMwVcpW9WC-VmrqPsWGl3idgQLbNENTrhTv9JniyxomiMh9g/viewform",
+  "St. Lawrence U. Visit Day":"https://x.com/i/chat/3424787061-1926620281629560832",
+  "Union Junior Day":"https://docs.google.com/forms/d/e/1FAIpQLSfJxa4inwuwhID7B98oDkletHKPbNe9eTu2R_S-2yiyhvn6wg/viewform",
+  "F&M Camp":"https://www.blueandwhitefootballcamps.com/",
+  "U Rochester In-Person Jr Day":"https://em.armssoftware.com/ls/click?upn=u001.44uq9U7KK2XhXgtFIBEDOqRl-2BXmwjEi9MrGzKD9WBjmEIuiIeSXa5Pxm-2Box26TnnFvXg_05lXV46NJF5U-2B3pLxCAg0zg-2BswTAUOr-2FEfcSbhNToVty5OQFrs4n4diY4nUbbnuLeOARTfHcpqPirMUQoc7JGsN-2FbB1trkMxyShzJJZM0VRMpd-2FBeiL6BoOK0SlhDWuD2uWe9t90WXhlbuAqKOqy-2BmSVpaIVLT0FUPSkgZ-2BKQ2qiXwaqQOFp0T-2FMiU-2ByO4XSFgoGsKtmOsXdYZWtZ6bkdnH9ez9XTOhBjCJ7odlDw-2FiDoFznyA3z8eX7RG4FOPRR8d8SklZW0ZsRN5tdYJgvHzhp9Yo-2BLQD45LIRxK1hw6t-2F7HoxOOhomggy4-2FjWxjzl",
+  "Bowdoin Camp":"https://www.polarbearfootballcamps.com/",
+  "Catholic Conference Showcase":"https://x.com/XBHS_Football/status/2031739673505144932?s=20",
+  "Bates Camp":"https://www.bobcatfootballclinics.com/",
+  "Denison Camp":"https://denisonbigred.com/sports/football/camps",
+  "Empire Elite Camp":"https://newenglandelitefootballclinic.com/one-day-clinics/",
+  "Rochester Camp":"https://rochesterfootball.totalcamps.com/shop/EVENT",
+  "NE Elite Camp":"https://newenglandelitefootballclinic.com/home/",
+  "Brown Mega Camp":"http://www.jamesperryfootballcamps.com/",
+  "Amherst Camp":"https://amherstfootball.totalcamps.com/shop/EVENT",
+  "Williams Camp":"https://www.purpleandgoldfootballcamps.com/",
+  "WPI Camp":"https://wpifootballcampsandclinics.totalcamps.com/About%20Us",
+  "Holy Cross Junior Day":"https://docs.google.com/forms/d/e/1FAIpQLScCxvS4c4-7vJpFN4dP4fJyh5UjO_O_fm_BHoHHko5JFmJ-rw/viewform",
+  "Hampton On-Campus Jr Day":"https://t.co/G4TXaFQAHq",
+  "Bates Junior Day":"https://questionnaires.armssoftware.com/b0cc5985b233",
+  "RPI On-Campus Jr Day":"https://docs.google.com/forms/d/e/1FAIpQLSeoYY19qren9e2ghEicXvAG855o-GAqk4lxL_UAaGieGrDi_g/viewform",
+  "URI Junior Day":"https://docs.google.com/forms/d/e/1FAIpQLSdd2khxgbJCuq5Ds3TUp0_Aoml1ior5i3sDyL4XQ6nikHNdhQ/viewform",
+  "UMaine On-Campus Jr Day":"https://register.ryzer.com/camp.cfm?sport=1&id=325291",
+  "UNH On-Campus Jr Day":"https://docs.google.com/forms/d/e/1FAIpQLScROw-WXURqtI2ItaPmyb-ynEtZk9FdSkxiOBQeiZw_Bpo3ag/viewform",
+  "Marist Mega Camp":"https://www.maristexposurecamp.com/",
+  "Fordham Mega Camp":"https://register.ryzer.com/camp.cfm?sport=1&id=326909",
+  "UMaine Camp":"https://register.ryzer.com/camp.cfm?sport=1&id=325297",
+  "UNH Camp":"https://www.unh.edu/youthprograms/course/football-evening-camp",
+  "Georgetown Camp":"https://www.hoyafootballcamp.com/shop/product/588360",
+  "Bentley Camp":"https://bentleyfootballcamps.totalcamps.com/shop/product/581427",
+  "Lehigh Camp":"https://register.ryzer.com/camp.cfm?sport=1&id=322828",
+  "Lawrence Junior Day":"",
+  "Howard On-Campus Jr Day":"",
+};
+
+function schoolLink(name) {
+  const url = SCHOOL_COACH_URLS[name];
+  if (!url) return name;
+  return `<a href="${url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--border)">${name}<span style="font-size:0.6rem;color:var(--faint);margin-left:2px">↗</span></a>`;
+}
+
 // ── Helpers ──
 function divBadge(div) {
   const cls = div.includes('FCS')||div.includes('1-') ? 'div-fcs' : div.includes('D3')||div.includes('3-') ? 'div-d3' : div.includes('D2')||div.includes('2-') ? 'div-d2' : 'div-fbs';
@@ -914,7 +1037,7 @@ function renderShortList(p) {
   const rest = p.shortList.filter(s => !s.preOffer).sort(byDROI);
   function rows(arr) {
     return arr.map(s => `<tr>
-      <td style="font-weight:500">${s.school}</td>
+      <td style="font-weight:500">${schoolLink(s.school)}</td>
       <td>${s.conf}</td>
       <td>${divBadge(s.div)}</td>
       <td style="text-align:right">${s.coa}</td>
@@ -949,7 +1072,7 @@ function xLink(handle) {
 }
 function renderTracking(p) {
   const rows = p.tracking.map(t => `<tr>
-    <td style="font-weight:500;white-space:nowrap">${t.school}</td>
+    <td style="font-weight:500;white-space:nowrap">${schoolLink(t.school)}</td>
     <td style="color:var(--muted)">${t.coach}${xLink(t.twitter)}</td>
     <td style="color:var(--faint);font-size:0.65rem">${t.role}</td>
     <td class="chk">${yn(t.followedOnX)}</td>
@@ -992,7 +1115,7 @@ function renderEvents(p) {
       return `<div class="event-item ${cls}">
         <span class="event-badge ${badgeCls}">${badgeTxt}</span>
         <div class="event-info">
-          <div class="event-school">${e.school}</div>
+          <div class="event-school">${(url => url ? `<a href="${url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--border)">${e.school}<span style="font-size:0.6rem;color:var(--faint);margin-left:3px">↗</span></a>` : e.school)(EVENT_URLS[e.school])}</div>
           <div class="event-type">${e.type} ${divBadge(e.div)}</div>
           <div class="event-when">${e.day}, ${e.date} · ${e.time} · ${e.location}</div>
           ${e.note ? `<div class="event-note">${e.note}</div>` : ''}
