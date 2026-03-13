@@ -215,6 +215,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
+// ── Film Growth ──
+function filmGrowth(p) {
+  const current = getFilmViews(p);
+  const baseline = p.filmViewsBaseline;
+  const days = (new Date(p.filmViewsSnapshotDate) - new Date(p.filmViewsBaselineDate)) / 86400000;
+  const months = days / 30.44;
+  const totalGrowthPct = baseline > 0 ? ((current - baseline) / baseline) * 100 : 0;
+  const momPct = months > 0 ? totalGrowthPct / months : 0;
+  const delta = current - baseline;
+  return { delta, totalGrowthPct, momPct, months };
+}
+
 // ── Film Views (localStorage overrides) ──
 function filmViewsKey(id) { return `gritos_filmviews_${id}`; }
 function getFilmViews(p) {
@@ -264,6 +276,9 @@ const PLAYERS = [
   progress: 62.1,
   headshot: "https://static.hudl.com/users/prod/20219692_f9d8f956f9cc4166a6f71ceb72806b35.jpg",
   filmViews: 77,
+  filmViewsBaseline: 72,
+  filmViewsBaselineDate: "2026-01-30",
+  filmViewsSnapshotDate: "2026-03-12",
   filmTitle: "Jesse Bargar 27' Junior Highlights",
   filmUploaded: "Jan 30, 2026",
   hudlUrl: "http://www.hudl.com/v/2TV47c",
@@ -387,6 +402,9 @@ const PLAYERS = [
   progress: 60.7,
   headshot: "https://static.hudl.com/users/prod/23224402_8f670d98cd4a42bda35ffc5bfc6ad9e8.jpg",
   filmViews: 57,
+  filmViewsBaseline: 55,
+  filmViewsBaselineDate: "2026-02-13",
+  filmViewsSnapshotDate: "2026-03-12",
   filmTitle: "Junior Year Highlights",
   filmUploaded: "Feb 13, 2026",
   hudlUrl: "http://www.hudl.com/v/2THSWm",
@@ -549,13 +567,18 @@ function renderLanding() {
           <div class="pc-stat-lbl">Film Views ✎</div>
         </div>
       </div>
-      <a href="${p.hudlUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;padding:7px 10px;margin-bottom:10px;text-decoration:none;">
-        <span style="font-size:0.9rem">🎬</span>
+      ${(()=>{ const g = filmGrowth(p); return `
+      <a href="${p.hudlUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;padding:8px 10px;margin-bottom:10px;text-decoration:none;">
+        <span style="font-size:1rem">🎬</span>
         <div style="flex:1;min-width:0">
           <div style="font-size:0.72rem;font-weight:700;color:#c2410c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.filmTitle}</div>
-          <div style="font-size:0.65rem;color:#ea580c">Uploaded ${p.filmUploaded} · Watch on Hudl ↗</div>
+          <div style="font-size:0.65rem;color:#ea580c;margin-top:1px">Uploaded ${p.filmUploaded} · Watch on Hudl ↗</div>
         </div>
-      </a>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:0.9rem;font-weight:800;color:#c2410c">+${g.delta} <span style="font-size:0.65rem;font-weight:600">(+${g.totalGrowthPct.toFixed(1)}%)</span></div>
+          <div style="font-size:0.6rem;color:#ea580c;margin-top:1px">+${g.momPct.toFixed(1)}%&thinsp;/&thinsp;mo · ${g.months.toFixed(1)} mo</div>
+        </div>
+      </a>`; })()}
       <div class="progress-wrap">
         <div class="progress-label"><span>Pipeline Progress</span><strong>${p.progress}%</strong></div>
         <div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%"></div></div>
