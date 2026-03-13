@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrittyOS — Coach Dashboard</title>
+<style>
+:root {
+  --bg: #f8fafc; --surface: #ffffff; --surface2: #f1f5f9;
+  --border: #e2e8f0; --text: #0f172a; --muted: #64748b; --faint: #94a3b8;
+  --accent: #16a34a; --accent-l: #f0fdf4; --accent-t: #15803d;
+  --gold: #d97706; --gold-l: #fffbeb;
+  --radius: 10px; --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  --offer: #7c3aed; --offer-l: #f5f3ff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
+
+/* ── Gate ── */
+#gate { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.gate-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px; width: min(360px, 90vw); text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+.gate-logo { font-size: 1.5rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; margin-bottom: 4px; }
+.gate-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 28px; }
+.gate-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; outline: none; text-align: center; letter-spacing: 2px; transition: border-color .15s; }
+.gate-input:focus { border-color: var(--accent); }
+.gate-btn { margin-top: 12px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background .15s; }
+.gate-btn:hover { background: var(--accent-t); }
+.gate-err { margin-top: 10px; color: #dc2626; font-size: 0.8rem; min-height: 18px; }
+
+/* ── App shell ── */
+#app { display: none; min-height: 100vh; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.topbar-logo { font-size: 1.1rem; font-weight: 800; color: var(--accent); letter-spacing: -0.3px; }
+.topbar-title { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+.topbar-school { margin-left: auto; font-size: 0.72rem; color: var(--faint); font-weight: 600; letter-spacing: 0.3px; }
+
+/* ── Landing ── */
+#landing { padding: 16px; }
+.landing-heading { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.landing-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; }
+.roster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+
+/* ── Player card (landing) ── */
+.player-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: box-shadow .15s, border-color .15s; position: relative; overflow: hidden; }
+.player-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); border-color: var(--accent); }
+.player-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+.pc-offer::before { background: var(--offer); }
+.pc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.pc-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: var(--muted); flex-shrink: 0; }
+.pc-name { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.pc-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.pc-said { font-size: 0.65rem; color: var(--faint); margin-top: 1px; letter-spacing: 0.3px; }
+.pc-offer-banner { background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 7px; padding: 8px 10px; margin-bottom: 10px; }
+.pc-offer-label { font-size: 0.65rem; font-weight: 700; color: var(--offer); letter-spacing: 0.5px; text-transform: uppercase; }
+.pc-offer-school { font-size: 0.85rem; font-weight: 700; color: var(--offer); margin-top: 1px; }
+.pc-offer-detail { font-size: 0.7rem; color: #7c3aed99; margin-top: 1px; }
+.pc-stats { display: flex; gap: 12px; margin-bottom: 10px; }
+.pc-stat { flex: 1; }
+.pc-stat-val { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+.pc-offer-count .pc-stat-val { color: var(--offer); }
+.pc-stat-lbl { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2px; }
+.progress-wrap { margin-bottom: 10px; }
+.progress-label { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.progress-label span { font-size: 0.7rem; color: var(--muted); }
+.progress-label strong { font-size: 0.7rem; color: var(--accent-t); }
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
+.pc-events { }
+.pc-events-label { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+.pc-event-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.pc-event-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-critical { background: #dc2626; }
+.dot-registered { background: var(--accent); }
+.dot-upcoming { background: var(--faint); }
+.pc-event-name { font-size: 0.72rem; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-event-date { font-size: 0.65rem; color: var(--muted); flex-shrink: 0; }
+.pc-cta { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; padding: 8px; background: var(--accent-l); border-radius: 7px; font-size: 0.75rem; font-weight: 600; color: var(--accent-t); }
+
+/* ── Detail view ── */
+#detail { display: none; padding-bottom: 24px; }
+.detail-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+.back-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--text); }
+.detail-name { font-size: 1rem; font-weight: 800; }
+.detail-pos { font-size: 0.75rem; color: var(--muted); }
+.detail-offer-pill { margin-left: auto; background: var(--offer-l); border: 1px solid #c4b5fd; border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; font-weight: 700; color: var(--offer); }
+
+/* Offer highlight bar */
+.offer-bar { margin: 12px 16px 0; background: var(--offer-l); border: 1.5px solid #c4b5fd; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.offer-bar-icon { font-size: 1.4rem; }
+.offer-bar-label { font-size: 0.65rem; font-weight: 700; color: var(--offer); letter-spacing: 0.5px; text-transform: uppercase; }
+.offer-bar-school { font-size: 1rem; font-weight: 800; color: var(--offer); }
+.offer-bar-detail { font-size: 0.72rem; color: #7c3aedaa; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--surface); margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 10px 14px; font-size: 0.75rem; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
+.tab.active { color: var(--accent-t); border-bottom-color: var(--accent); }
+
+.tab-panel { display: none; padding: 14px 16px; }
+.tab-panel.active { display: block; }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+.data-table th { background: var(--surface2); color: var(--muted); font-weight: 700; text-align: left; padding: 7px 8px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1; }
+.data-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.data-table tr:hover td { background: var(--surface2); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+
+/* Score bar */
+.score-cell { display: flex; align-items: center; gap: 6px; }
+.score-bar-bg { flex: 1; max-width: 60px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 3px; }
+.score-val { font-weight: 700; font-size: 0.72rem; }
+
+/* Dot indicators */
+.dot-yn { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.dot-yes { background: var(--accent); }
+.dot-no { background: var(--border); }
+
+/* Events list */
+.event-list { display: flex; flex-direction: column; gap: 8px; }
+.event-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px; }
+.event-item.critical { border-color: #fca5a5; background: #fff5f5; }
+.event-item.registered { border-color: #86efac; background: var(--accent-l); }
+.event-item.today { border-color: var(--gold); background: var(--gold-l); }
+.event-badge { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border-radius: 4px; padding: 2px 6px; flex-shrink: 0; margin-top: 2px; }
+.badge-critical { background: #fee2e2; color: #dc2626; }
+.badge-registered { background: #dcfce7; color: #16a34a; }
+.badge-today { background: #fef3c7; color: #d97706; }
+.badge-upcoming { background: var(--surface2); color: var(--muted); }
+.event-info { flex: 1; min-width: 0; }
+.event-school { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+.event-type { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+.event-when { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.event-note { font-size: 0.65rem; color: var(--offer); font-style: italic; margin-top: 2px; }
+.event-div { font-size: 0.65rem; background: var(--surface2); border-radius: 4px; padding: 1px 5px; color: var(--faint); display: inline-block; margin-top: 2px; }
+
+/* Division badge */
+.div-badge { font-size: 0.62rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; display: inline-block; }
+.div-fcs { background: #dcfce7; color: #166534; }
+.div-d3 { background: #dbeafe; color: #1e40af; }
+.div-d2 { background: #fce7f3; color: #9d174d; }
+.div-fbs { background: #fef3c7; color: #92400e; }
+
+/* Tracking columns — show checkmarks */
+.chk { text-align: center; }
+.chk-y { color: var(--accent); font-size: 0.9rem; }
+.chk-n { color: var(--border); font-size: 0.9rem; }
+
+/* Section header */
+.section-head { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); padding: 10px 0 6px; }
+
+/* Rank badge */
+.rank-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); font-size: 0.7rem; font-weight: 700; color: var(--muted); }
+.rank-num.top { background: var(--gold-l); color: var(--gold); border: 1px solid #fcd34d; }
+
+@media (max-width: 600px) {
+  .roster-grid { grid-template-columns: 1fr; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th, .data-table td { padding: 6px 6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Password Gate ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">GrittyOS</div>
+    <div class="gate-sub">Coach Recruiting Dashboard<br>Boston College High School</div>
+    <input class="gate-input" id="gateInput" type="password" placeholder="Access Code" autocomplete="off">
+    <button class="gate-btn" onclick="checkGate()">Enter</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+
+<!-- ── Main App ── -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">GrittyOS</div>
+    <div class="topbar-title">Recruiting Center</div>
+    <div class="topbar-school">BC HIGH · CLASS 2027</div>
+  </div>
+
+  <!-- Landing -->
+  <div id="landing">
+    <div style="padding: 14px 16px 0;">
+      <div class="landing-heading">Player Recruiting Dashboard</div>
+      <div class="landing-sub">Live recruiting pipeline — select a player for full detail</div>
+    </div>
+    <div class="roster-grid" style="padding: 12px 16px;" id="rosterGrid"></div>
+  </div>
+
+  <!-- Detail -->
+  <div id="detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showLanding()">← Back</button>
+      <div>
+        <div class="detail-name" id="detailName"></div>
+        <div class="detail-pos" id="detailPos"></div>
+      </div>
+      <div id="detailOfferPill"></div>
+    </div>
+    <div id="detailOfferBar"></div>
+    <div class="tabs" id="detailTabs"></div>
+    <div id="detailPanels"></div>
+  </div>
+</div>
+
+<script>
+// ── Auth ──
+const ACCESS = btoa("BCHS2027"); // password: BCHS2027
+function checkGate() {
+  const v = document.getElementById('gateInput').value.trim();
+  if (btoa(v) === ACCESS || sessionStorage.getItem('gritos_auth') === ACCESS) {
+    sessionStorage.setItem('gritos_auth', ACCESS);
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderLanding();
+  } else {
+    document.getElementById('gateErr').textContent = 'Incorrect access code.';
+    document.getElementById('gateInput').value = '';
+  }
+}
+document.getElementById('gateInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkGate(); });
+if (sessionStorage.getItem('gritos_auth') === ACCESS) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ── Data ──
+const PLAYERS = [
+{
+  id: "GRIT-2027-002",
+  name: "Jesse Bargar",
+  initials: "JB",
+  position: "DT",
+  school: "Boston College High School",
+  classYear: 2027,
+  progress: 62.1,
+  filmViews: 72,
+  lastUpdated: "3/12/2026",
+  offerHighlight: {
+    school: "Oberlin College",
+    coach: "John Pont (Head Coach)",
+    conference: "NCAC · D3",
+    date: "March 12, 2026",
+    note: "Verbal offer — music conservatory + football alignment"
+  },
+  onCampusOffers: 1,
+  scoreboard: [
+    {rank:1,school:"Oberlin College",div:"3-Div III",score:62.5,indyAdm:false,hcContact:true,acContact:true,jrDay:true,camp:false,visit:true,admRead:true,faRead:false},
+    {rank:2,school:"Hobart William Smith",div:"3-Div III",score:62.5,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:3,school:"St Lawrence University",div:"3-Div III",score:62.5,indyAdm:true,hcContact:false,acContact:true,jrDay:false,camp:true,visit:true,admRead:true,faRead:false},
+    {rank:4,school:"Worcester Polytechnic",div:"3-Div III",score:62.5,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:5,school:"Franklin & Marshall",div:"3-Div III",score:50.0,indyAdm:false,hcContact:true,acContact:true,jrDay:false,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:6,school:"Muhlenberg College",div:"3-Div III",score:50.0,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:7,school:"University of Rochester",div:"3-Div III",score:50.0,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:8,school:"Lawrence University",div:"3-Div III",score:50.0,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:9,school:"Union College",div:"3-Div III",score:37.5,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:10,school:"Bates College",div:"3-Div III",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:11,school:"Kenyon College",div:"3-Div III",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:12,school:"Denison University",div:"3-Div III",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:13,school:"St Olaf College",div:"3-Div III",score:37.5,indyAdm:true,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:true,faRead:false},
+    {rank:14,school:"William Paterson",div:"3-Div III",score:37.5,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:false,visit:false,admRead:false,faRead:false},
+    {rank:15,school:"Wesleyan University",div:"3-Div III",score:25.0,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:16,school:"Carleton College",div:"3-Div III",score:25.0,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:true,faRead:false},
+    {rank:17,school:"Hamilton College",div:"3-Div III",score:12.5,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:false,faRead:false},
+    {rank:18,school:"Bowdoin College",div:"3-Div III",score:12.5,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:false,faRead:false},
+  ],
+  shortList: [
+    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:46.07,preOffer:true},
+    {school:"Muhlenberg College",conf:"Centennial",div:"3-Div III",coa:"$85,053",ltdv:"$1,913,963",roi:40.34,preOffer:true},
+    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:47.74,preOffer:true},
+    {school:"Hobart William Smith",conf:"Liberty",div:"3-Div III",coa:"$89,771",ltdv:"$1,697,779",roi:36.39,preOffer:true},
+    {school:"St Lawrence University",conf:"Liberty",div:"3-Div III",coa:"$88,778",ltdv:"$1,835,136",roi:41.87,preOffer:true},
+    {school:"University of Rochester",conf:"Liberty",div:"3-Div III",coa:"$94,040",ltdv:"$2,176,205",roi:41.20,preOffer:true},
+    {school:"Hamilton College",conf:"NESCAC",div:"3-Div III",coa:"$92,684",ltdv:"$2,423,600",roi:36.24,preOffer:true},
+    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:31.91,preOffer:true},
+    {school:"Bowdoin College",conf:"NESCAC",div:"3-Div III",coa:"$93,261",ltdv:"$2,306,828",roi:34.49,preOffer:true},
+    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:39.69,preOffer:true},
+    {school:"Lawrence University",conf:"Midwest",div:"3-Div III",coa:"$75,282",ltdv:"$1,566,610",roi:33.20,preOffer:true},
+    {school:"Oberlin College",conf:"NCAC",div:"3-Div III",coa:"$95,227",ltdv:"$1,987,000",roi:54.55,preOffer:true},
+    {school:"Kenyon College",conf:"NCAC",div:"3-Div III",coa:"$95,561",ltdv:"$2,255,500",roi:46.95,preOffer:true},
+    {school:"Denison University",conf:"NCAC",div:"3-Div III",coa:"$91,245",ltdv:"$1,921,440",roi:44.53,preOffer:true},
+    {school:"Worcester Polytechnic",conf:"NEWMAC",div:"3-Div III",coa:"$85,629",ltdv:"$3,013,694",roi:81.18,preOffer:true},
+    {school:"St Olaf College",conf:"MIAC",div:"3-Div III",coa:"$79,055",ltdv:"$1,753,500",roi:39.21,preOffer:true},
+    {school:"William Paterson",conf:"NJAC",div:"3-Div III",coa:"$38,546",ltdv:"$917,463",roi:14.82,preOffer:true},
+    {school:"Carleton College",conf:"MIAC",div:"3-Div III",coa:"$93,664",ltdv:"$2,171,234",roi:40.97,preOffer:true},
+    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:44.17,preOffer:false},
+    {school:"Johns Hopkins",conf:"Centennial",div:"3-Div III",coa:"$92,900",ltdv:"$2,993,147",roi:58.74,preOffer:false},
+    {school:"Carnegie Mellon",conf:"PAC",div:"3-Div III",coa:"$90,512",ltdv:"$3,566,646",roi:63.52,preOffer:false},
+    {school:"Gettysburg College",conf:"Centennial",div:"3-Div III",coa:"$90,773",ltdv:"$2,042,604",roi:54.48,preOffer:false},
+    {school:"Ithaca College",conf:"Liberty",div:"3-Div III",coa:"$74,574",ltdv:"$1,630,420",roi:35.96,preOffer:false},
+    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:47.29,preOffer:false},
+    {school:"Colby College",conf:"NESCAC",div:"3-Div III",coa:"$93,650",ltdv:"$2,631,717",roi:39.35,preOffer:false},
+    {school:"Williams College",conf:"NESCAC",div:"3-Div III",coa:"$93,996",ltdv:"$2,502,576",roi:37.42,preOffer:false},
+    {school:"Amherst College",conf:"NESCAC",div:"3-Div III",coa:"$95,204",ltdv:"$2,638,181",roi:39.45,preOffer:false},
+    {school:"Trinity College",conf:"NESCAC",div:"3-Div III",coa:"$96,768",ltdv:"$2,171,622",roi:44.33,preOffer:false},
+    {school:"Tufts University",conf:"NESCAC",div:"3-Div III",coa:"$96,692",ltdv:"$2,349,116",roi:43.07,preOffer:false},
+    {school:"Middlebury College",conf:"NESCAC",div:"3-Div III",coa:"$93,293",ltdv:"$2,207,346",roi:33.00,preOffer:false},
+    {school:"Chapman University",conf:"SCIAC",div:"3-Div III",coa:"$92,117",ltdv:"$1,848,280",roi:37.55,preOffer:false},
+    {school:"Univ of Redlands",conf:"SCIAC",div:"3-Div III",coa:"$89,048",ltdv:"$1,663,807",roi:36.31,preOffer:false},
+    {school:"Utica University",conf:"Empire 8",div:"3-Div III",coa:"$47,664",ltdv:"$998,460",roi:16.81,preOffer:false},
+  ],
+  tracking: [
+    {school:"Franklin & Marshall",conf:"Centennial",coach:"Chilamo Taylor",role:"WRs & AC",twitter:"@ChilamoT",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:true,offer:false},
+    {school:"Muhlenberg College",conf:"Centennial",coach:"Scott O'Hara",role:"TEs",twitter:"@Coach_OHara51",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Hobart William Smith",conf:"Liberty",coach:"Liam Murphy",role:"OL",twitter:"@Liam_FMurphy_",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"St Lawrence University",conf:"Liberty",coach:"Dominic Centofanti",role:"RC & STs",twitter:"@CoachCentofanti",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:true,hcContact:false,offer:false},
+    {school:"University of Rochester",conf:"Liberty",coach:"Jason Henshaw",role:"DL & RC",twitter:"@IamcoacHHeav",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Union College",conf:"Liberty",coach:"Ryan Ehrets",role:"OL",twitter:"@R_Ehrets",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:false,handoff:false,jrDay:true,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Oberlin College",conf:"NCAC",coach:"John Pont",role:"HC",twitter:"@CoachJPont",introType:"Followed You on X",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:false,jrDay:true,visit:true,camp:false,preRead:true,hcContact:true,offer:true},
+    {school:"Kenyon College",conf:"NCAC",coach:"Ian Good",role:"HC",twitter:"@IanMGood",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:false,dmOpen:false,dmSent:false,handoff:false,jrDay:true,visit:true,camp:false,preRead:false,hcContact:false,offer:false},
+    {school:"Denison University",conf:"NCAC",coach:"Jovon Johnson",role:"DC",twitter:"@coachjo51",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:true,dmOpen:false,dmSent:false,handoff:false,jrDay:true,visit:false,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Worcester Polytechnic",conf:"NEWMAC",coach:"Salvatore Malignaggi",role:"WR",twitter:"@Coach_MSal",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:true,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Bates College",conf:"NESCAC",coach:"Matt Wherhahn",role:"DC",twitter:"Matt Wherhahn",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:false,preRead:true,hcContact:false,offer:false},
+    {school:"Bowdoin College",conf:"NESCAC",coach:"Marcus Adams",role:"DL",twitter:"@MarcusAdams_51",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:false,preRead:false,hcContact:false,offer:false},
+    {school:"Wesleyan University",conf:"NESCAC",coach:"Adam Chicoine",role:"DC",twitter:"@CoachSheeks",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:false,handoff:false,jrDay:true,visit:false,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Hamilton College",conf:"NESCAC",coach:"Randi Moore",role:"DC",twitter:"@CoachRMoore34",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:false,camp:false,preRead:false,hcContact:false,offer:false},
+    {school:"Lawrence University",conf:"Midwest",coach:"Dallas Dean",role:"RC & OL",twitter:"@coachdallas3",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:true,followedOnX:true,followsYou:false,dmOpen:false,dmSent:false,handoff:false,jrDay:true,visit:true,camp:false,preRead:false,hcContact:false,offer:false},
+    {school:"St Olaf College",conf:"MIAC",coach:"Lucas Kleinschrodt",role:"DC",twitter:"@CoachLucasKlein",introType:"You are Interested",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:false,preRead:true,hcContact:false,offer:false},
+    {school:"Carleton College",conf:"MIAC",coach:"Tom Journell",role:"HC",twitter:"@CoachJournell",introType:"Followed You on X",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:false,preRead:true,hcContact:false,offer:false},
+  ],
+  events: [
+    {month:"March",school:"Bentley Virtual Jr Day",div:"D2",type:"Virtual Jr Day",day:"Thursday",date:"March 12, 2026",time:"8:00 PM",location:"Link",registered:true,onCalendar:true,critical:false,note:"TODAY",today:true},
+    {month:"March",school:"U Rochester Virtual Jr Day",div:"D3",type:"Virtual Jr Day",day:"Sunday",date:"March 29, 2026",time:"5:30 PM",location:"Link",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"Trinity Junior Day",div:"D3",type:"In-Person Jr Day",day:"Saturday",date:"April 4, 2026",time:"10:00 AM",location:"Hartford, CT",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"Catholic University Jr Day",div:"D3",type:"In-Person Jr Day",day:"Saturday",date:"April 11, 2026",time:"8:30 AM",location:"Washington D.C.",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"April",school:"Red & Black Camp",div:"D3",type:"FB Mega Camp",day:"Sunday",date:"April 12, 2026",time:"1:00 PM",location:"Middletown, CT",registered:true,onCalendar:true,critical:true,note:"Top 3 Critical Camp"},
+    {month:"April",school:"WPI On-Campus Jr Day",div:"D3",type:"In-Person Jr Day",day:"Saturday",date:"April 18, 2026",time:"11:30 AM",location:"Worcester, MA",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"St. Lawrence U. Visit Day",div:"D3",type:"Official Visit",day:"Monday",date:"April 20, 2026",time:"10:00 AM",location:"Canton, NY",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"Union Junior Day",div:"D3",type:"In-Person Jr Day",day:"Friday",date:"April 24, 2026",time:"2:30 PM",location:"Schenectady, NY",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"F&M Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"April 26, 2026",time:"10:30 AM",location:"Lancaster, PA",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"May",school:"U Rochester In-Person Jr Day",div:"D3",type:"In-Person Jr Day",day:"Friday",date:"May 1, 2026",time:"12:00 PM",location:"Rochester, NY",registered:true,onCalendar:true,critical:false,note:"Get pass from guidance"},
+    {month:"May",school:"Bowdoin Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 3, 2026",time:"11:00 AM",location:"Brunswick, ME",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"May",school:"Catholic Conference Showcase",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
+    {month:"May",school:"Bates Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 24, 2026",time:"9:00 AM",location:"Lewiston, ME",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"May",school:"Denison Camp",div:"D3",type:"FB School Camp",day:"Saturday",date:"May 30, 2026",time:"9:00 AM",location:"Granville, OH",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"June",school:"Empire Elite Camp",div:"D1-D3",type:"FB Mega Camp",day:"Sunday",date:"June 7, 2026",time:"8:00 AM",location:"Schenectady, NY",registered:true,onCalendar:true,critical:true,note:"Top 3 Critical Camp"},
+    {month:"June",school:"Rochester Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"June 14, 2026",time:"8:30 AM",location:"Rochester, NY",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"June",school:"NE Elite Camp",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"June 25, 2026",time:"8:00 AM",location:"Medford, MA",registered:true,onCalendar:true,critical:true,note:"Top 3 Critical Camp"},
+    {month:"July",school:"Brown Mega Camp",div:"D1-D3",type:"FB Mega Camp",day:"Wednesday",date:"July 8, 2026",time:"5:00 PM",location:"Providence, RI",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"Denison Camp",div:"D3",type:"FB School Camp",day:"Saturday",date:"July 11, 2026",time:"9:00 AM",location:"Granville, OH",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"Bowdoin Camp",div:"D3",type:"FB School Camp",day:"Wednesday",date:"July 15, 2026",time:"11:00 AM",location:"Brunswick, ME",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"Amherst Camp",div:"D3",type:"FB School Camp",day:"Friday",date:"July 17, 2026",time:"2:00 PM",location:"Amherst, MA",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"Williams Camp",div:"D3",type:"FB School Camp",day:"Saturday",date:"July 18, 2026",time:"12:00 PM",location:"Williamstown, MA",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"Bates Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"July 19, 2026",time:"9:00 AM",location:"Lewiston, ME",registered:false,onCalendar:false,critical:false,note:""},
+    {month:"July",school:"WPI Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"July 26, 2026",time:"8:00 AM",location:"Worcester, MA",registered:false,onCalendar:false,critical:false,note:""},
+  ]
+},
+{
+  id: "GRIT-2027-004",
+  name: "Ayden Watkins",
+  initials: "AW",
+  position: "CB / ATH",
+  school: "Boston College High School",
+  classYear: 2027,
+  progress: 60.7,
+  filmViews: 55,
+  lastUpdated: "3/12/2026",
+  offerHighlight: null,
+  onCampusOffers: 8,
+  scoreboard: [
+    {rank:1,school:"University of Maine",div:"1-FCS",score:75.0,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:true,faRead:false},
+    {rank:2,school:"Wesleyan University",div:"3-Div III",score:62.5,indyAdm:false,hcContact:true,acContact:false,jrDay:true,camp:true,visit:true,admRead:true,faRead:false},
+    {rank:3,school:"RPI",div:"3-Div III",score:62.5,indyAdm:true,hcContact:true,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:4,school:"UNH",div:"1-FCS",score:50.0,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:5,school:"Franklin & Marshall",div:"3-Div III",score:50.0,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:true,visit:true,admRead:false,faRead:false},
+    {rank:6,school:"Union College",div:"3-Div III",score:50.0,indyAdm:false,hcContact:true,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:7,school:"URI",div:"1-FCS",score:37.5,indyAdm:true,hcContact:false,acContact:false,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:8,school:"William & Mary",div:"1-FCS",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:9,school:"College of the Holy Cross",div:"1-FCS",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:10,school:"Bates College",div:"3-Div III",score:37.5,indyAdm:false,hcContact:false,acContact:true,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:11,school:"Catholic University",div:"3-Div III",score:37.5,indyAdm:true,hcContact:false,acContact:true,jrDay:true,camp:false,visit:false,admRead:false,faRead:false},
+    {rank:12,school:"Villanova University",div:"1-FCS",score:25.0,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:13,school:"Hampton University",div:"1-FCS",score:25.0,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:14,school:"Howard University",div:"1-FCS",score:25.0,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:false,visit:true,admRead:false,faRead:false},
+    {rank:15,school:"Georgetown University",div:"1-FCS",score:25.0,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:16,school:"Bentley University",div:"2-Div II",score:25.0,indyAdm:false,hcContact:false,acContact:false,jrDay:true,camp:true,visit:false,admRead:false,faRead:false},
+    {rank:17,school:"Dickinson College",div:"3-Div III",score:12.5,indyAdm:false,hcContact:false,acContact:true,jrDay:false,camp:false,visit:false,admRead:false,faRead:false},
+  ],
+  shortList: [
+    {school:"Villanova University",conf:"Patriot",div:"1-FCS",coa:"$92,904",ltdv:"$3,019,959",roi:24.74,preOffer:true},
+    {school:"University of Maine",conf:"CAA",div:"1-FCS",coa:"$31,506",ltdv:"$993,168",roi:24.47,preOffer:true},
+    {school:"URI",conf:"CAA",div:"1-FCS",coa:"$38,301",ltdv:"$1,662,812",roi:31.87,preOffer:true},
+    {school:"UNH",conf:"CAA",div:"1-FCS",coa:"$40,362",ltdv:"$1,620,740",roi:39.78,preOffer:true},
+    {school:"William & Mary",conf:"Patriot",div:"1-FCS",coa:"$47,697",ltdv:"$2,215,183",roi:31.88,preOffer:true},
+    {school:"Hampton University",conf:"CAA",div:"1-FCS",coa:"$51,240",ltdv:"$935,256",roi:11.12,preOffer:true},
+    {school:"Howard University",conf:"MEAC",div:"1-FCS",coa:"$60,934",ltdv:"$1,378,000",roi:12.61,preOffer:true},
+    {school:"College of the Holy Cross",conf:"Patriot",div:"1-FCS",coa:"$89,481",ltdv:"$2,540,444",roi:25.11,preOffer:true},
+    {school:"Georgetown University",conf:"Patriot",div:"1-FCS",coa:"$97,267",ltdv:"$3,276,925",roi:17.84,preOffer:true},
+    {school:"Bates College",conf:"NESCAC",div:"3-Div III",coa:"$91,896",ltdv:"$2,134,300",roi:9.29,preOffer:true},
+    {school:"Bentley University",conf:"NE10",div:"2-Div II",coa:"$88,032",ltdv:"$3,378,443",roi:16.34,preOffer:true},
+    {school:"Catholic University",conf:"Landmark",div:"3-Div III",coa:"$85,361",ltdv:"$2,095,061",roi:10.11,preOffer:true},
+    {school:"Franklin & Marshall",conf:"Centennial",div:"3-Div III",coa:"$93,589",ltdv:"$2,313,078",roi:10.85,preOffer:true},
+    {school:"Wesleyan University",conf:"NESCAC",div:"3-Div III",coa:"$97,297",ltdv:"$2,265,442",roi:10.30,preOffer:true},
+    {school:"Union College",conf:"Liberty",div:"3-Div III",coa:"$92,531",ltdv:"$2,180,951",roi:10.46,preOffer:true},
+    {school:"RPI",conf:"Liberty",div:"3-Div III",coa:"$89,552",ltdv:"$2,865,694",roi:14.21,preOffer:true},
+    {school:"Dickinson College",conf:"Centennial",div:"3-Div III",coa:"$90,397",ltdv:"$2,043,790",roi:9.77,preOffer:true},
+    {school:"Elon University",conf:"CAA",div:"1-FCS",coa:"$68,715",ltdv:"$1,758,752",roi:15.36,preOffer:false},
+    {school:"Towson University",conf:"CAA",div:"1-FCS",coa:"$34,367",ltdv:"$1,298,304",roi:27.50,preOffer:false},
+    {school:"Stony Brook",conf:"CAA",div:"1-FCS",coa:"$34,939",ltdv:"$1,924,452",roi:47.20,preOffer:false},
+    {school:"NC A&T",conf:"CAA",div:"1-FCS",coa:"$21,782",ltdv:"$906,428",roi:28.40,preOffer:false},
+    {school:"Albany",conf:"CAA",div:"1-FCS",coa:"$31,786",ltdv:"$1,201,132",roi:32.37,preOffer:false},
+    {school:"Fordham University",conf:"Patriot",div:"1-FCS",coa:"$98,354",ltdv:"$2,125,550",roi:14.33,preOffer:false},
+    {school:"Lehigh University",conf:"Patriot",div:"1-FCS",coa:"$88,935",ltdv:"$3,109,861",roi:35.88,preOffer:false},
+    {school:"Morgan State",conf:"MEAC",div:"1-FCS",coa:"$28,470",ltdv:"$699,048",roi:16.51,preOffer:false},
+    {school:"Delaware State",conf:"MEAC",div:"1-FCS",coa:"$35,494",ltdv:"$603,096",roi:11.86,preOffer:false},
+    {school:"UMass Amherst",conf:"Indy",div:"1-FBS",coa:"$38,978",ltdv:"$1,796,256",roi:9.76,preOffer:false},
+    {school:"Morehouse College",conf:"SIAC",div:"2-Div II",coa:"$55,172",ltdv:"$990,196",roi:4.35,preOffer:false},
+    {school:"Clark Atlanta",conf:"SIAC",div:"2-Div II",coa:"$48,584",ltdv:"$860,400",roi:3.74,preOffer:false},
+    {school:"Johnson C Smith",conf:"CIAA",div:"2-Div II",coa:"$38,168",ltdv:"$559,896",roi:2.44,preOffer:false},
+    {school:"University of San Diego",conf:"Pioneer",div:"1-FCS",coa:"$89,158",ltdv:"$2,193,686",roi:10.43,preOffer:false},
+    {school:"Davidson College",conf:"Pioneer",div:"1-FCS",coa:"$88,494",ltdv:"$2,470,922",roi:11.40,preOffer:false},
+    {school:"Univ of St Thomas",conf:"Pioneer",div:"1-FCS",coa:"$76,611",ltdv:"$1,865,719",roi:8.78,preOffer:false},
+    {school:"Marist College",conf:"Pioneer",div:"1-FCS",coa:"$74,261",ltdv:"$2,002,387",roi:9.26,preOffer:false},
+    {school:"Tuskegee University",conf:"SIAC",div:"2-Div II",coa:"$48,355",ltdv:"$981,948",roi:4.27,preOffer:false},
+    {school:"Bryant University",conf:"CAA",div:"1-FCS",coa:"$76,813",ltdv:"$2,407,920",roi:11.57,preOffer:false},
+    {school:"FL A&M",conf:"SWAC",div:"1-FCS",coa:"$26,297",ltdv:"$851,816",roi:22.68,preOffer:false},
+  ],
+  tracking: [
+    {school:"Villanova",conf:"Patriot",coach:"Forrest Rhyne",role:"LBs",twitter:"@CoachRhyne",introType:"Previous Meeting",qdone:true,admdone:true,followupSent:true,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"University of Maine",conf:"CAA",coach:"AJ McLaughlin",role:"DL",twitter:"@Coach_AjMc",introType:"Previous Meeting",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:true,hcContact:true,offer:false},
+    {school:"URI",conf:"CAA",coach:"Tyler Loftus",role:"RC",twitter:"@Coach_Loftus",introType:"You are Interested",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"UNH",conf:"CAA",coach:"Joe Bick",role:"OL & RC",twitter:"@Coach_Bick",introType:"You are Interested",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"William & Mary",conf:"Patriot",coach:"Raisi-I Dowling",role:"Co-DC, Secondary",twitter:"@CoachDowl",introType:"You are Interested",qdone:true,admdone:false,followupSent:true,replied:true,followedOnX:true,followsYou:false,dmOpen:false,dmSent:false,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Hampton",conf:"CAA",coach:"Delbert Tyler II",role:"RC",twitter:"@coachtyler34",introType:"You are Interested",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:false,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Howard",conf:"MEAC",coach:"Nicholas Gould",role:"RC",twitter:"@coachnickgould",introType:"You are Interested",qdone:true,admdone:false,followupSent:true,replied:false,followedOnX:true,followsYou:false,dmOpen:false,dmSent:false,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Holy Cross",conf:"Patriot",coach:"Rich Gunnell",role:"WRs",twitter:"@CoachRG18",introType:"You are Interested",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Georgetown",conf:"Patriot",coach:"Kevin Doherty",role:"DC",twitter:"@coachkrd",introType:"You are Interested",qdone:true,admdone:false,followupSent:true,replied:false,followedOnX:true,followsYou:false,dmOpen:false,dmSent:false,handoff:false,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Bates College",conf:"NESCAC",coach:"Matt Wherhahn",role:"DC",twitter:"@coachwehrhahn",introType:"Followed You on X",qdone:true,admdone:true,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:false,preRead:true,hcContact:false,offer:false},
+    {school:"Bentley",conf:"NE10",coach:"Osho Omoyeni",role:"DC & RC",twitter:"@Coach_OOmoyeni",introType:"You are Interested",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:false,followsYou:false,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:false,preRead:true,hcContact:false,offer:false},
+    {school:"Catholic University",conf:"Landmark",coach:"Coach Coles",role:"RC",twitter:"@Coach_Coles74",introType:"Sent You an Email",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:false,followsYou:false,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:false,preRead:false,hcContact:false,offer:false},
+    {school:"Franklin & Marshall",conf:"Centennial",coach:"Sean Moore",role:"DL & STs",twitter:"@CoachMoore_99",introType:"Sent You an Email",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:true,offer:false},
+    {school:"Wesleyan",conf:"NESCAC",coach:"Dan DiCenzo",role:"HC",twitter:"@CoachDiCenzo",introType:"Followed You on X",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:false,jrDay:false,visit:true,camp:true,preRead:true,hcContact:true,offer:false},
+    {school:"Union College",conf:"Liberty",coach:"Ryan Ehrets",role:"OL & RC",twitter:"@R_Ehrets",introType:"Followed You on X",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:true},
+    {school:"RPI",conf:"Liberty",coach:"Ralph Isernia",role:"HC",twitter:"@CoachRI",introType:"Followed You on X",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:true,camp:true,preRead:false,hcContact:false,offer:false},
+    {school:"Dickinson",conf:"Centennial",coach:"Kyle Schuck",role:"OL",twitter:"@DCcoachSchuck",introType:"Followed You on X",qdone:true,admdone:false,followupSent:false,replied:false,followedOnX:true,followsYou:true,dmOpen:true,dmSent:true,handoff:true,jrDay:false,visit:false,camp:false,preRead:false,hcContact:false,offer:false},
+  ],
+  events: [
+    {month:"March",school:"Bentley Virtual Jr Day",div:"D2",type:"Virtual Jr Day",day:"Thursday",date:"March 12, 2026",time:"8:00 PM",location:"Link",registered:true,onCalendar:true,critical:false,note:"TODAY",today:true},
+    {month:"March",school:"Holy Cross Junior Day",div:"FCS",type:"In-Person Jr Day",day:"Saturday",date:"March 14, 2026",time:"9:30 AM",location:"Worcester, MA",registered:true,onCalendar:true,critical:false,note:"Get pass from Guidance"},
+    {month:"March",school:"Hampton On-Campus Jr Day",div:"FCS",type:"In-Person Jr Day",day:"Friday",date:"March 20, 2026",time:"11:00 AM",location:"Hampton, VA",registered:true,onCalendar:true,critical:false,note:"Get pass from Guidance"},
+    {month:"March",school:"Howard On-Campus Jr Day",div:"FCS",type:"In-Person Jr Day",day:"Saturday",date:"March 21, 2026",time:"9:00 AM",location:"Washington D.C.",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"March",school:"Bates Junior Day",div:"D3",type:"Virtual Jr Day",day:"Sunday",date:"March 22, 2026",time:"5:00 PM",location:"Link",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"March",school:"RPI On-Campus Jr Day",div:"D3",type:"In-Person Jr Day",day:"Wednesday",date:"March 25, 2026",time:"4:30 PM",location:"Troy, NY",registered:true,onCalendar:true,critical:false,note:"Get pass from Guidance"},
+    {month:"April",school:"Trinity Junior Day",div:"D3",type:"In-Person Jr Day",day:"Saturday",date:"April 4, 2026",time:"10:00 AM",location:"Hartford, CT",registered:true,onCalendar:true,critical:false,note:"High Academic D2/D3 Tour"},
+    {month:"April",school:"URI Junior Day",div:"FCS",type:"In-Person Jr Day",day:"Saturday",date:"April 11, 2026",time:"9:00 AM",location:"Kingston, RI",registered:true,onCalendar:true,critical:false,note:"CAA Tour"},
+    {month:"April",school:"Red & Black Camp",div:"D3",type:"FB Mega Camp",day:"Sunday",date:"April 12, 2026",time:"1:00 PM",location:"Middletown, CT",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"UMaine On-Campus Jr Day",div:"FCS",type:"In-Person Jr Day",day:"Saturday",date:"April 18, 2026",time:"7:15 AM",location:"Orono, ME",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"April",school:"UNH On-Campus Jr Day",div:"FCS",type:"In-Person Jr Day",day:"Sunday",date:"April 19, 2026",time:"10:00 AM",location:"Dover, NH",registered:true,onCalendar:true,critical:false,note:"CAA Tour"},
+    {month:"April",school:"Union Junior Day",div:"D3",type:"In-Person Jr Day",day:"Friday",date:"April 24, 2026",time:"2:30 PM",location:"Schenectady, NY",registered:true,onCalendar:true,critical:false,note:"High Academic D2/D3 Tour"},
+    {month:"April",school:"F&M Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"April 26, 2026",time:"10:30 AM",location:"Lancaster, PA",registered:true,onCalendar:true,critical:false,note:"High Academic D2/D3 Tour"},
+    {month:"May",school:"Bowdoin Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 3, 2026",time:"11:00 AM",location:"Brunswick, ME",registered:false,onCalendar:false,critical:false,note:"NESCAC Tour"},
+    {month:"May",school:"Catholic Conference Showcase",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"May 14, 2026",time:"5:00 PM",location:"TBD",registered:false,onCalendar:false,critical:true,note:"MUST ATTEND"},
+    {month:"May",school:"Bates Camp",div:"D3",type:"FB School Camp",day:"Sunday",date:"May 24, 2026",time:"9:00 AM",location:"Lewiston, ME",registered:false,onCalendar:false,critical:false,note:"NESCAC Tour"},
+    {month:"May",school:"Marist Mega Camp",div:"FCS",type:"FB Mega Camp",day:"Sunday",date:"May 31, 2026",time:"8:00 AM",location:"Poughkeepsie, NY",registered:false,onCalendar:false,critical:false,note:"High Academic D2/D3 Tour"},
+    {month:"June",school:"Fordham Mega Camp",div:"FCS/D3",type:"FB Mega Camp",day:"Thursday",date:"June 4, 2026",time:"11:30 AM",location:"Bronx, NY",registered:false,onCalendar:false,critical:false,note:"Patriot League Tour"},
+    {month:"June",school:"UMaine Camp",div:"FCS",type:"FB School Camp",day:"Friday",date:"June 19, 2026",time:"8:00 AM",location:"Orono, ME",registered:true,onCalendar:true,critical:false,note:""},
+    {month:"June",school:"NE Elite Camp",div:"D1-D3",type:"FB Mega Camp",day:"Thursday",date:"June 25, 2026",time:"8:00 AM",location:"Medford, MA",registered:true,onCalendar:true,critical:true,note:"Remaining Critical Camp"},
+    {month:"July",school:"UNH Camp",div:"FCS",type:"FB School Camp",day:"Tuesday",date:"July 7, 2026",time:"5:30 PM",location:"Durham, NH",registered:false,onCalendar:false,critical:false,note:"CAA Tour"},
+    {month:"July",school:"Brown Mega Camp",div:"D1-D3",type:"FB Mega Camp",day:"Wednesday",date:"July 8, 2026",time:"5:00 PM",location:"Providence, RI",registered:false,onCalendar:false,critical:false,note:"High Academic Tour"},
+    {month:"July",school:"Georgetown Camp",div:"FCS",type:"FB School Camp",day:"Friday",date:"July 10, 2026",time:"8:30 AM",location:"Washington D.C.",registered:false,onCalendar:false,critical:false,note:"Patriot League Tour"},
+    {month:"July",school:"Bentley Camp",div:"D2",type:"FB School Camp",day:"Friday",date:"July 17, 2026",time:"2:30 PM",location:"Waltham, MA",registered:false,onCalendar:false,critical:false,note:"High Academic Tour"},
+    {month:"July",school:"Lehigh Camp",div:"FCS",type:"FB School Camp",day:"Wednesday",date:"July 22, 2026",time:"3:00 PM",location:"Bethlehem, PA",registered:false,onCalendar:false,critical:false,note:"Patriot League Tour"},
+  ]
+}
+];
+
+// ── Helpers ──
+function divBadge(div) {
+  const cls = div.includes('FCS')||div.includes('1-') ? 'div-fcs' : div.includes('D3')||div.includes('3-') ? 'div-d3' : div.includes('D2')||div.includes('2-') ? 'div-d2' : 'div-fbs';
+  const label = div.includes('FCS')||div.includes('1-FCS') ? 'FCS' : div.includes('FBS')||div.includes('1-FBS') ? 'FBS' : div.includes('2-') ? 'D2' : 'D3';
+  return `<span class="div-badge ${cls}">${label}</span>`;
+}
+function yn(v) { return v ? '<span class="chk-y">✓</span>' : '<span class="chk-n">·</span>'; }
+function scoreColor(s) { return s >= 62.5 ? '#7c3aed' : s >= 50 ? '#d97706' : s >= 37.5 ? '#2563eb' : '#64748b'; }
+
+// ── Landing ──
+function nextEvents(player, n) {
+  return player.events.filter(e => !e.past).slice(0, n);
+}
+
+function renderLanding() {
+  const grid = document.getElementById('rosterGrid');
+  grid.innerHTML = PLAYERS.map((p, i) => {
+    const topEvents = nextEvents(p, 3);
+    const offerClass = p.offerHighlight ? 'pc-offer' : '';
+    return `<div class="player-card ${offerClass}" onclick="showDetail(${i})">
+      <div class="pc-top">
+        <div class="pc-avatar">${p.initials}</div>
+        <div>
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-meta">${p.position} · Class of ${p.classYear}</div>
+          <div class="pc-said">${p.id}</div>
+        </div>
+      </div>
+      ${p.offerHighlight ? `
+      <div class="pc-offer-banner">
+        <div class="pc-offer-label">🎉 Verbal Offer Received</div>
+        <div class="pc-offer-school">${p.offerHighlight.school}</div>
+        <div class="pc-offer-detail">${p.offerHighlight.coach} · ${p.offerHighlight.conference} · ${p.offerHighlight.date}</div>
+      </div>` : ''}
+      <div class="pc-stats">
+        <div class="pc-stat">
+          <div class="pc-stat-val">${p.shortList.length}</div>
+          <div class="pc-stat-lbl">Schools</div>
+        </div>
+        <div class="pc-stat ${p.onCampusOffers > 0 ? 'pc-offer-count' : ''}">
+          <div class="pc-stat-val">${p.onCampusOffers}</div>
+          <div class="pc-stat-lbl">${p.onCampusOffers === 1 ? 'Offer' : 'Offers'}</div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-val">${p.filmViews}</div>
+          <div class="pc-stat-lbl">Film Views</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Pipeline Progress</span><strong>${p.progress}%</strong></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%"></div></div>
+      </div>
+      <div class="pc-events">
+        <div class="pc-events-label">Upcoming Events</div>
+        ${topEvents.map(e => `
+        <div class="pc-event-row">
+          <div class="pc-event-dot ${e.critical ? 'dot-critical' : e.registered ? 'dot-registered' : 'dot-upcoming'}"></div>
+          <div class="pc-event-name">${e.school}</div>
+          <div class="pc-event-date">${e.date.replace(', 2026','').replace(', 2025','')}</div>
+        </div>`).join('')}
+      </div>
+      <div class="pc-cta">View Full Profile →</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Detail ──
+let currentPlayer = null;
+function showDetail(idx) {
+  currentPlayer = PLAYERS[idx];
+  const p = currentPlayer;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('detail').style.display = 'block';
+  document.getElementById('detailName').textContent = p.name;
+  document.getElementById('detailPos').textContent = `${p.position} · ${p.id} · Class ${p.classYear}`;
+
+  const pill = document.getElementById('detailOfferPill');
+  if (p.offerHighlight) {
+    pill.innerHTML = `<span class="detail-offer-pill">🎉 Verbal Offer — ${p.offerHighlight.school}</span>`;
+  } else if (p.onCampusOffers > 0) {
+    pill.innerHTML = `<span class="detail-offer-pill" style="background:#f0fdf4;border-color:#86efac;color:#16a34a">${p.onCampusOffers} On-Campus Offer${p.onCampusOffers>1?'s':''}</span>`;
+  } else { pill.innerHTML = ''; }
+
+  const offerBar = document.getElementById('detailOfferBar');
+  if (p.offerHighlight) {
+    offerBar.innerHTML = `<div class="offer-bar">
+      <div class="offer-bar-icon">🏈</div>
+      <div>
+        <div class="offer-bar-label">Verbal Offer — ${p.offerHighlight.date}</div>
+        <div class="offer-bar-school">${p.offerHighlight.school}</div>
+        <div class="offer-bar-detail">${p.offerHighlight.coach} · ${p.offerHighlight.conference}</div>
+        ${p.offerHighlight.note ? `<div class="offer-bar-detail" style="margin-top:2px;font-style:italic">${p.offerHighlight.note}</div>` : ''}
+      </div>
+    </div>`;
+  } else { offerBar.innerHTML = ''; }
+
+  const tabs = ['Scoreboard','Short List','Tracking','Events'];
+  document.getElementById('detailTabs').innerHTML = tabs.map((t,i) =>
+    `<div class="tab ${i===0?'active':''}" onclick="switchTab(${i})">${t}</div>`
+  ).join('');
+
+  document.getElementById('detailPanels').innerHTML = `
+    <div class="tab-panel active" id="panel0">${renderScoreboard(p)}</div>
+    <div class="tab-panel" id="panel1">${renderShortList(p)}</div>
+    <div class="tab-panel" id="panel2">${renderTracking(p)}</div>
+    <div class="tab-panel" id="panel3">${renderEvents(p)}</div>
+  `;
+}
+
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', i===j));
+  document.querySelectorAll('.tab-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+}
+
+function showLanding() {
+  document.getElementById('detail').style.display = 'none';
+  document.getElementById('landing').style.display = 'block';
+}
+
+function renderScoreboard(p) {
+  const rows = p.scoreboard.map(s => {
+    const c = scoreColor(s.score);
+    const pct = (s.score / 100) * 100;
+    const isOffer = p.offerHighlight && p.offerHighlight.school.toLowerCase().includes(s.school.toLowerCase().split(' ')[0]);
+    return `<tr${isOffer ? ' style="background:#f5f3ff"' : ''}>
+      <td><span class="rank-num ${s.rank <= 3 ? 'top' : ''}">${s.rank}</span></td>
+      <td style="font-weight:${isOffer?700:500}">${s.school}${isOffer?' 🎉':''}</td>
+      <td>${divBadge(s.div)}</td>
+      <td><div class="score-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${c}"></div></div><span class="score-val" style="color:${c}">${s.score}%</span></div></td>
+      <td class="chk">${yn(s.hcContact)}</td>
+      <td class="chk">${yn(s.acContact)}</td>
+      <td class="chk">${yn(s.jrDay)}</td>
+      <td class="chk">${yn(s.camp)}</td>
+      <td class="chk">${yn(s.visit)}</td>
+      <td class="chk">${yn(s.admRead)}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>#</th><th>School</th><th>Div</th><th>Score</th>
+      <th>HC</th><th>AC</th><th>Jr Day</th><th>Camp</th><th>Visit</th><th>Adm</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderShortList(p) {
+  const preOffer = p.shortList.filter(s => s.preOffer);
+  const rest = p.shortList.filter(s => !s.preOffer);
+  function rows(arr) {
+    return arr.map(s => `<tr>
+      <td style="font-weight:500">${s.school}</td>
+      <td>${s.conf}</td>
+      <td>${divBadge(s.div)}</td>
+      <td style="text-align:right">${s.coa}</td>
+      <td style="text-align:right">${s.ltdv}</td>
+      <td style="text-align:right;font-weight:600;color:var(--accent-t)">${s.roi}x</td>
+    </tr>`).join('');
+  }
+  return `<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>School</th><th>Conf</th><th>Div</th><th style="text-align:right">Ann. COA</th><th style="text-align:right">LTDV</th><th style="text-align:right">ROI</th></tr></thead>
+    <tbody>
+      <tr><td colspan="6" style="background:var(--accent-l);font-size:0.65rem;font-weight:700;color:var(--accent-t);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Pre-Offer Phase (${preOffer.length})</td></tr>
+      ${rows(preOffer)}
+      <tr><td colspan="6" style="background:var(--surface2);font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;padding:6px 8px">Remaining Short List (${rest.length})</td></tr>
+      ${rows(rest)}
+    </tbody>
+  </table></div>`;
+}
+
+function renderTracking(p) {
+  const rows = p.tracking.map(t => `<tr>
+    <td style="font-weight:500;white-space:nowrap">${t.school}</td>
+    <td style="color:var(--muted)">${t.coach}</td>
+    <td style="color:var(--faint);font-size:0.65rem">${t.role}</td>
+    <td class="chk">${yn(t.followedOnX)}</td>
+    <td class="chk">${yn(t.followsYou)}</td>
+    <td class="chk">${yn(t.dmSent)}</td>
+    <td class="chk">${yn(t.replied||t.handoff)}</td>
+    <td class="chk">${yn(t.jrDay||t.visit)}</td>
+    <td class="chk">${yn(t.camp)}</td>
+    <td class="chk">${yn(t.hcContact)}</td>
+    <td class="chk">${yn(t.offer)}</td>
+  </tr>`).join('');
+  return `<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>School</th><th>Coach</th><th>Role</th>
+      <th>Fol'd X</th><th>Fols You</th><th>DM</th><th>Reply</th>
+      <th>Jr Day</th><th>Camp</th><th>HC</th><th>Offer</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderEvents(p) {
+  const months = [...new Set(p.events.map(e => e.month))];
+  return months.map(month => {
+    const evs = p.events.filter(e => e.month === month);
+    return `<div class="section-head">${month}</div>
+    <div class="event-list">
+    ${evs.map(e => {
+      const cls = e.today ? 'today' : e.critical ? 'critical' : e.registered ? 'registered' : '';
+      const badgeCls = e.today ? 'badge-today' : e.critical ? 'badge-critical' : e.registered ? 'badge-registered' : 'badge-upcoming';
+      const badgeTxt = e.today ? 'TODAY' : e.critical ? 'CRITICAL' : e.registered ? 'REGISTERED' : 'UPCOMING';
+      return `<div class="event-item ${cls}">
+        <span class="event-badge ${badgeCls}">${badgeTxt}</span>
+        <div class="event-info">
+          <div class="event-school">${e.school}</div>
+          <div class="event-type">${e.type} ${divBadge(e.div)}</div>
+          <div class="event-when">${e.day}, ${e.date} · ${e.time} · ${e.location}</div>
+          ${e.note ? `<div class="event-note">${e.note}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ── Init ──
+if (sessionStorage.getItem('gritos_auth') === ACCESS) {
+  renderLanding();
+}
+</script>
+</body>
+</html>
