@@ -298,7 +298,7 @@ function computeScores(player) {
   if (awards.allConference)   boost += 0.10;
   if (awards.allState)        boost += 0.15;
   TIER_ORDER.forEach(tier => { athFit[tier] = Math.min(1, athFit[tier] + boost); });
-  const qualifyingTiers = TIER_ORDER.filter(t => athFit[t] > 0.50);
+  const qualifyingTiers = TIER_ORDER.filter(t => athFit[t] > 0.40);
   return { pr, acadRigor, acadTestOpt, athFit, qualifyingTiers, lookupPos };
 }
 
