@@ -211,6 +211,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
+// ── Film Views (localStorage overrides) ──
+function filmViewsKey(id) { return `gritos_filmviews_${id}`; }
+function getFilmViews(p) {
+  const stored = localStorage.getItem(filmViewsKey(p.id));
+  return stored !== null ? parseInt(stored) : p.filmViews;
+}
+function editFilmViews(id, statEl) {
+  const player = PLAYERS.find(p => p.id === id);
+  const current = getFilmViews(player);
+  const input = prompt(`Update Hudl film views for ${player.name}:`, current);
+  if (input === null) return;
+  const val = parseInt(input);
+  if (isNaN(val) || val < 0) return;
+  localStorage.setItem(filmViewsKey(id), val);
+  statEl.querySelector('.film-views-val').textContent = val;
+}
+
 // ── Auth ──
 const ACCESS = btoa("BCHS2027"); // password: BCHS2027
 function checkGate() {
@@ -520,9 +537,9 @@ function renderLanding() {
           <div class="pc-stat-val">${p.onCampusOffers}</div>
           <div class="pc-stat-lbl">${p.onCampusOffers === 1 ? 'Offer' : 'Offers'}</div>
         </div>
-        <div class="pc-stat">
-          <div class="pc-stat-val">${p.filmViews}</div>
-          <div class="pc-stat-lbl">Film Views</div>
+        <div class="pc-stat" style="cursor:pointer" onclick="editFilmViews('${p.id}', this)" title="Tap to update">
+          <div class="pc-stat-val film-views-val">${getFilmViews(p)}</div>
+          <div class="pc-stat-lbl">Film Views ✎</div>
         </div>
       </div>
       <a href="${p.hudlUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;padding:7px 10px;margin-bottom:10px;text-decoration:none;">
