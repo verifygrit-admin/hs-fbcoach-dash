@@ -275,6 +275,9 @@ const PLAYERS = [
   classYear: 2027,
   progress: 62.1,
   headshot: "https://static.hudl.com/users/prod/20219692_f9d8f956f9cc4166a6f71ceb72806b35.jpg",
+  xUrl: "https://x.com/JesseBargar27",
+  xHandle: "@JesseBargar27",
+  hudlProfileUrl: "https://www.hudl.com/athlete/20219692",
   filmViews: 77,
   filmViewsBaseline: 6,
   filmViewsBaselineDate: "2026-01-30",
@@ -401,6 +404,9 @@ const PLAYERS = [
   classYear: 2027,
   progress: 60.7,
   headshot: "https://static.hudl.com/users/prod/23224402_8f670d98cd4a42bda35ffc5bfc6ad9e8.jpg",
+  xUrl: "https://x.com/AydenWatkins08_",
+  xHandle: "@AydenWatkins08_",
+  hudlProfileUrl: "https://www.hudl.com/athlete/23224402",
   filmViews: 57,
   filmViewsBaseline: 8,
   filmViewsBaselineDate: "2026-02-13",
@@ -544,6 +550,10 @@ function renderLanding() {
           <div class="pc-name">${p.name}</div>
           <div class="pc-meta">${p.position} · Class of ${p.classYear}</div>
           <div class="pc-said">${p.id}</div>
+          <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+            <a href="${p.xUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:0.62rem;font-weight:700;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;text-decoration:none;display:flex;align-items:center;gap:3px">𝕏 ${p.xHandle}</a>
+            <a href="${p.hudlProfileUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:0.62rem;font-weight:700;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:4px;padding:2px 6px;text-decoration:none">Hudl Profile ↗</a>
+          </div>
         </div>
         <img src="Boston_College_High__MA__Eagles_Logo-221855465.png" alt="BC High" style="height:36px;width:36px;object-fit:contain;flex-shrink:0;opacity:0.85;">
       </div>
